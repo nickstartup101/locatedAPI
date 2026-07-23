@@ -114,13 +114,13 @@
   let map, marker, service;
   let nearbyCafeCount = 0;
 
-  // ຟັງຊັນປ່ຽນໜ້າ
+  // ຟັງຊັນປ່ຽນໜ້າ (Fix Error switchView is not defined)
   function switchView(viewName) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-' + viewName).classList.add('active');
     document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
-    const activeNav = document.getElementById('nav-' + viewName);
-    if(activeNav) activeNav.classList.add('active');
+    const navBtn = document.getElementById('nav-' + viewName);
+    if(navBtn) navBtn.classList.add('active');
   }
 
   function initMap() {
@@ -162,11 +162,11 @@
     btn.disabled = true; btn.textContent = "⏳ ກຳລັງວິເຄາະ...";
 
     const pos = marker.getPosition();
-    const prompt = `Evaluate cafe business location Lat ${pos.lat()}, Lng ${pos.lng()} with ${nearbyCafeCount} nearby competitors. Provide your output strictly in JSON format with exactly these keys: overallScore (number 0-100), summary (Lao string, 2-3 sentences), and kpis (object with keys: customer, access, competition, parking - each 0-25). Use Lao language for the summary text.`;
+    const prompt = `Evaluate cafe business location Lat ${pos.lat()}, Lng ${pos.lng()} with ${nearbyCafeCount} nearby competitors. Respond ONLY with a valid JSON object in Lao language: {"overallScore": number, "summary": "Lao string", "kpis": {"customer": number, "access": number, "competition": number, "parking": number}}. Do not include any extra text.`;
 
     try {
-      // ✅ ປ່ຽນມາໃຊ້ v1 (Stable) ເພື່ອປ້ອງກັນ 404
-      const url = `https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+      // ✅ ໃຊ້ v1beta ເພື່ອປ້ອງກັນ 404
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
       
       const response = await fetch(url, {
         method: 'POST',
@@ -178,16 +178,18 @@
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error.message || "API connection failed");
+        throw new Error(errorData.error.message || "API Error");
       }
 
       const data = await response.json();
       let responseText = data.candidates[0].content.parts[0].text;
       
-      // ລ້າງ Markdown ເພື່ອໃຫ້ JSON.parse ເຮັດວຽກໄດ້
-      responseText = responseText.replace(/```json|```/g, "").trim();
+      // ລ້າງ Markdown Code Blocks (ຖ້າມີ)
+      responseText = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+      
       const result = JSON.parse(responseText);
       
+      // Update UI
       document.getElementById('scoreBig').textContent = result.overallScore;
       document.getElementById('summaryText').textContent = result.summary;
       
@@ -202,6 +204,7 @@
       document.getElementById('kpiContainer').innerHTML = kpiHTML;
       document.getElementById('statusPill').textContent = result.overallScore >= 75 ? "✅ ແນະນຳ" : "⚠️ ພິຈາລະນາ";
       showToast("ວິເຄາະສຳເລັດ!");
+
     } catch (err) {
       console.error(err);
       showToast("Error: " + err.message);
