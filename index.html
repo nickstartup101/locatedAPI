@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Dolce | AI Site Evaluation Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@300;400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-950:#081428; --navy-900:#0B1E3D; --navy-800:#122A52; --accent:#2455CE; 
+    --gold:#C6A15B; --bg:#EFF2F8; --paper:#FFFFFF; --ink:#0B1E3D; --ink-soft:#5B6B85;
+    --line: rgba(11,30,61,0.08); --shadow-md: 0 12px 32px rgba(11,30,61,0.10); --r-md: 16px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Noto Sans Lao','Noto Sans',sans-serif; color:var(--ink); background: var(--bg); min-height:100vh; }
+  .app{ display:grid; grid-template-columns:264px 1fr; min-height:100vh; }
+  .sidebar{ background:linear-gradient(185deg, var(--navy-900) 0%, var(--navy-950) 100%); color:#EAF0FF; padding:28px 20px; position:sticky; top:0; height:100vh; }
+  .brand .name{ font-weight:800; font-size:20px; color:var(--gold); letter-spacing:1px; }
+  .nav{ margin-top:30px; display:flex; flex-direction:column; gap:8px; }
+  .nav a{ padding:12px; border-radius:12px; font-size:14px; color:rgba(234,240,255,0.7); text-decoration:none; cursor:pointer; }
+  .nav a.active{ background:var(--accent); color:#fff; }
+  .main{ padding:30px; }
+  .view{ display:none; } .view.active{ display:block; }
+  .grid{ display:grid; grid-template-columns:repeat(12,1fr); gap:20px; }
+  .card{ background:#fff; border-radius:var(--r-md); padding:22px; box-shadow:var(--shadow-md); border:1px solid var(--line); }
+  .g-loc{grid-column:span 5;} .g-score{grid-column:span 3;} .g-summary{grid-column:span 4;}
+  .g-map{grid-column:span 8;} .g-kpi{grid-column:span 4;} .g-full{grid-column:span 12;}
+  .btn{ padding:14px 20px; border-radius:12px; border:none; font-weight:700; cursor:pointer; font-family: inherit; }
+  .btn-primary{ background:var(--accent); color:#fff; width:100%; box-shadow: 0 4px 10px rgba(36,85,206,0.3); }
+  .btn-primary:disabled{ opacity:0.6; cursor:not-allowed; }
+  .input-wrap input{ width:100%; padding:12px; border-radius:10px; border:1.5px solid var(--line); margin-bottom:10px; font-family: inherit; }
+  .map-box{ height:380px; background:#eee; border-radius:12px; overflow:hidden; border:1px solid var(--line); }
+  .kpi-row{ margin-bottom:15px; }
+  .bar-track{ height:10px; background:#f0f2f5; border-radius:10px; overflow:hidden; margin-top:5px; }
+  .bar-fill{ height:100%; background:var(--accent); width:0%; transition:width 1s; }
+  #toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--navy-950); color:#fff; padding:12px 24px; border-radius:12px; display:none; z-index:1000; font-size: 14px; }
+  @media (max-width:900px){ .app{grid-template-columns:1fr;} .sidebar{display:none;} }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="name">LA DOLCE AI</div></div>
+    <nav class="nav">
+      <a onclick="switchView('dashboard')" class="active" id="nav-dashboard">📊 ໜ້າຫຼັກການປະເມີນ</a>
+      <a onclick="switchView('history')" id="nav-history">📝 ປະຫວັດການປະເມີນ</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <div id="view-dashboard" class="view active">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h1>Dashboard ການປະເມີນທຳເລ</h1>
+        <div id="coordTag" style="background:#fff; padding:8px 16px; border-radius:10px; font-weight:600; font-size:13px; border:1px solid var(--line);">📍 17.976769, 102.625430</div>
+      </div>
+
+      <div class="grid">
+        <section class="g-loc card">
+          <h3>🔍 ຄົ້ນຫາສະຖານທີ່</h3>
+          <div class="input-wrap" style="margin-top:15px;">
+            <input id="mapUrl" type="text" placeholder="ລິ້ງ Google Maps" value="https://maps.google.com/?q=17.976769,102.625430">
+          </div>
+          <button id="analyzeBtn" class="btn btn-primary" onclick="runAnalysis()">✨ ວິເຄາະດ້ວຍ Gemini AI</button>
+        </section>
+
+        <section class="g-score card" style="text-align:center;">
+          <h3 style="font-size:14px;">ຄະແນນລວມ</h3>
+          <h1 id="scoreBig" style="font-size:56px; color:var(--accent); margin:8px 0;">0</h1>
+          <div><span id="statusPill" style="padding:6px 14px; border-radius:20px; font-size:12px; background:#f0f2f5;">ລໍຖ້າການວິເຄາະ</span></div>
+        </section>
+
+        <section class="g-summary card">
+          <h3>🤖 ບົດສະຫຼຸບ AI</h3>
+          <p id="summaryText" style="font-size:14px; margin-top:12px; line-height:1.7;">ລາກໝຸດໄປຍັງຕຳແໜ່ງທີ່ຕ້ອງການ ແລ້ວກົດປຸ່ມ "ວິເຄາະດ້ວຍ AI".</p>
+        </section>
+
+        <section class="g-map card">
+          <div class="map-box" id="googleMap"></div>
+          <div style="margin-top:10px; display:flex; justify-content:space-between; font-size:13px;">
+            <span>* ລາກໝຸດເພື່ອປ່ຽນຕຳແໜ່ງ</span>
+            <span id="cafeCountStat" style="color:var(--accent); font-weight:700;">ກຳລັງຫາຂໍ້ມູນ...</span>
+          </div>
+        </section>
+
+        <section class="g-kpi card">
+          <h3>📊 KPI Scores</h3>
+          <div id="kpiContainer" style="margin-top:15px;">
+            <p style="font-size:12px; color:var(--ink-soft);">ຍັງບໍ່ມີຂໍ້ມູນການວິເຄາະ</p>
+          </div>
+        </section>
+        
+        <section class="g-full card" style="text-align:center; border:none; background:transparent;">
+            <button class="btn btn-primary" style="width:auto; padding:14px 40px;" onclick="saveEvaluation()">💾 ບັນທຶກລົງ Firebase</button>
+        </section>
+      </div>
+    </div>
+
+    <div id="view-history" class="view">
+        <h1>📝 ປະຫວັດການປະເມີນ</h1>
+        <p style="margin-top:20px;">ສ່ວນນີ້ຈະສະແດງລາຍການທີ່ເຄີຍບັນທຶກໄວ້ໃນ Firebase.</p>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  // ---------- CONFIGURATION ----------
+  const GEMINI_API_KEY = "AIzaSyAjuUcLk7EQE7W9O0Yz0jEDnf-Zd_THjBA"; 
+  const GEMINI_MODEL = "gemini-1.5-flash"; 
+
+  let map, marker, service;
+  let nearbyCafeCount = 0;
+
+  // ຟັງຊັນປ່ຽນໜ້າ
+  function switchView(viewName) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + viewName).classList.add('active');
+    document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+    const activeNav = document.getElementById('nav-' + viewName);
+    if(activeNav) activeNav.classList.add('active');
+  }
+
+  function initMap() {
+    const startPos = {lat:17.976769, lng:102.625430};
+    map = new google.maps.Map(document.getElementById('googleMap'), {
+      center: startPos, zoom: 16, mapTypeControl: false
+    });
+    marker = new google.maps.Marker({
+      position: startPos, map: map, draggable: true
+    });
+    service = new google.maps.places.PlacesService(map);
+    marker.addListener('dragend', () => {
+      const pos = marker.getPosition();
+      updateLocationData(pos.lat(), pos.lng());
+    });
+    updateLocationData(startPos.lat, startPos.lng);
+  }
+
+  function updateLocationData(lat, lng) {
+    document.getElementById('coordTag').textContent = `📍 ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    document.getElementById('mapUrl').value = `https://maps.google.com/?q=${lat.toFixed(6)},${lng.toFixed(6)}`;
+    const request = { location: {lat, lng}, radius: 500, type: ['cafe'] };
+    service.nearbySearch(request, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        nearbyCafeCount = results.length;
+        document.getElementById('cafeCountStat').textContent = `ພົບຮ້ານກາເຟໃກ້ຄຽງ ${nearbyCafeCount} ແຫ່ງ`;
+      }
+    });
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 3000);
+  }
+
+  async function runAnalysis() {
+    const btn = document.getElementById('analyzeBtn');
+    btn.disabled = true; btn.textContent = "⏳ ກຳລັງວິເຄາະ...";
+
+    const pos = marker.getPosition();
+    const prompt = `Evaluate cafe business location Lat ${pos.lat()}, Lng ${pos.lng()} with ${nearbyCafeCount} nearby competitors. Provide your output strictly in JSON format with exactly these keys: overallScore (number 0-100), summary (Lao string, 2-3 sentences), and kpis (object with keys: customer, access, competition, parking - each 0-25). Use Lao language for the summary text.`;
+
+    try {
+      // ✅ ປ່ຽນມາໃຊ້ v1 (Stable) ເພື່ອປ້ອງກັນ 404
+      const url = `https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }]
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error.message || "API connection failed");
+      }
+
+      const data = await response.json();
+      let responseText = data.candidates[0].content.parts[0].text;
+      
+      // ລ້າງ Markdown ເພື່ອໃຫ້ JSON.parse ເຮັດວຽກໄດ້
+      responseText = responseText.replace(/```json|```/g, "").trim();
+      const result = JSON.parse(responseText);
+      
+      document.getElementById('scoreBig').textContent = result.overallScore;
+      document.getElementById('summaryText').textContent = result.summary;
+      
+      const kpiHTML = Object.keys(result.kpis).map(key => `
+        <div class="kpi-row">
+          <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px; font-weight:bold;">
+            <span>${key.toUpperCase()}</span><span>${result.kpis[key]}/25</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(result.kpis[key]/25)*100}%"></div></div>
+        </div>
+      `).join('');
+      document.getElementById('kpiContainer').innerHTML = kpiHTML;
+      document.getElementById('statusPill').textContent = result.overallScore >= 75 ? "✅ ແນະນຳ" : "⚠️ ພິຈາລະນາ";
+      showToast("ວິເຄາະສຳເລັດ!");
+    } catch (err) {
+      console.error(err);
+      showToast("Error: " + err.message);
+    } finally {
+      btn.disabled = false; btn.textContent = "✨ ວິເຄາະດ້ວຍ Gemini AI";
+    }
+  }
+</script>
+
+<!-- FIREBASE SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC4ajOxcYLJCQ7sC0SRaWtKW0Ec0T3EO9g",
+    authDomain: "franchise-kpi.firebaseapp.com",
+    projectId: "franchise-kpi",
+    storageBucket: "franchise-kpi.firebasestorage.app",
+    messagingSenderId: "135131144520",
+    appId: "1:135131144520:web:d092c2b29f3b2cf6b5537d"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.saveEvaluation = async function() {
+    const score = document.getElementById('scoreBig').textContent;
+    if(score === "0") { alert("ກະລຸນາວິເຄາະກ່ອນບັນທຶກ!"); return; }
+    try {
+      await addDoc(collection(db, "evaluations"), {
+        score: parseInt(score),
+        summary: document.getElementById('summaryText').textContent,
+        location: document.getElementById('coordTag').textContent,
+        createdAt: serverTimestamp()
+      });
+      alert("✅ ບັນທຶກລົງ Firebase ສຳເລັດ!");
+    } catch (e) { alert("❌ ຜິດພາດ: " + e.message); }
+  }
+</script>
+
+<!-- GOOGLE MAPS API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5lW8Dfh4YPc6diI8wEzAfYgeZBBaJ37o&libraries=places&callback=initMap" async defer></script>
+
+</body>
+</html>
