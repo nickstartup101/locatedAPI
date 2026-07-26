@@ -188,19 +188,6 @@ function getGradeInfo(score) {
     return { grade: "D", text: "ສ່ຽງສູງ ບໍ່ຄຸ້ມຄ່າ (High Risk)", color: "text-red-700 bg-red-50 border-red-200" };
 }
 
-function generateToolPDF(containerId, filename) {
-    const element = document.getElementById(containerId);
-    if (!element) return alert("ບໍ່ພົບຂໍ້ມູນ Report");
-    const opt = {
-      margin:       [8, 8, 8, 8],
-      filename:     `${filename}_${Date.now()}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(element).save();
-}
-
 /* =========================================================================
    INTERACTIVE MAP COMPONENT
    ========================================================================= */
@@ -289,7 +276,6 @@ function App() {
     setTimeout(() => setToastMessage(""), 2500);
   };
 
-  // Realtime Firebase Listener
   useEffect(() => {
     try {
       db.collection("franchise_data").doc("locations").onSnapshot(doc => {
@@ -320,7 +306,6 @@ function App() {
     } catch(e) { setFirebaseStatus("offline"); }
   }, []);
 
-  // Recalculate Franchise Costs
   useEffect(() => {
     let computedTotal = totalFranchiseCost;
     const inputVal = Number(baseInputValue) || 0;
@@ -365,7 +350,6 @@ function App() {
 
   const autoScorePreview = calculateAutoLocationScore(locForm);
   const gradePreview = getGradeInfo(autoScorePreview);
-
   const mapSearchQuery = encodeURIComponent(`${pinLat.toFixed(4)},${pinLng.toFixed(4)}`);
 
   return React.createElement("div", { className: "min-h-screen flex flex-col" },
@@ -399,8 +383,8 @@ function App() {
     // Navigation Tabs
     React.createElement("nav", { className: "bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10 flex overflow-x-auto no-print" },
       [
-        { id: 'location', label: '1. ປະເມີນທຳເລ + GIS Map' },
-        { id: 'breakeven', label: '2. ຄຳນວນ Break-Even & ຈຳລອງ' },
+        { id: 'location', label: '1. ປະເມີນທຳເລ (Dynamic GIS Map & 500m)' },
+        { id: 'breakeven', label: '2. ຄຳນວນ Break-Even & ຈຳລອງ 3 ຢ່າງ' },
         { id: 'recipe', label: '3. Recipe SOP Suite (' + recipes.length + ')' },
         { id: 'compare', label: '4. ບັນທຶກ & ປຽບທຽບທຳເລ (' + locations.length + ')' },
         { id: 'franchise', label: '5. ຄິດໄລ່ Franchise (Dropdown)' }
@@ -414,7 +398,7 @@ function App() {
     // Main App Container
     React.createElement("main", { className: "flex-1 max-w-7xl w-full mx-auto p-6" },
       
-      // TAB 1: GIS LOCATION SCANNER & AI PROMPT BUILDER
+      // TAB 1: GIS LOCATION SCANNER & AI PROMPT BUILDER (COMPLETE 100%)
       tab === 'location' && React.createElement("div", { className: "grid grid-cols-1 lg:grid-cols-12 gap-6" },
         React.createElement("div", { className: "lg:col-span-7 bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4" },
           React.createElement("div", { className: "border-b pb-2 flex justify-between items-center" },
@@ -424,7 +408,7 @@ function App() {
           
           React.createElement("div", null,
             React.createElement("label", { className: "block text-xs font-semibold mb-1" }, "1. ຊື່ສະຖານທີ່ / ທຳເລໂຄງການ *"),
-            React.createElement("input", { type: "text", value: locForm.name, onChange: e => setLocForm({...locForm, name: e.target.value}), placeholder: "ເຊັ່ນ: ສາຂາ ດົງໂດກ", className: "w-full border rounded-lg p-2.5 text-sm" })
+            React.createElement("input", { type: "text", value: locForm.name, onChange: e => setLocForm({...locForm, name: e.target.value}), placeholder: "ເຊັ່ນ: ສາຂາ ດົງໂດກ", className: "w-full border rounded-lg p-2.5 text-sm font-semibold" })
           ),
 
           // Interactive Map Box
@@ -432,18 +416,18 @@ function App() {
 
           // Quick Search Buttons
           React.createElement("div", { className: "bg-blue-50 p-3 rounded-xl border border-brand-100 space-y-2" },
-            React.createElement("span", { className: "text-xs font-bold text-brand-900" }, "🔍 Quick Search ປຸ່ມຄົ້ນຫາດ່ວນອ້ອມຂ້າງ ( Google Maps ):"),
+            React.createElement("span", { className: "text-xs font-bold text-brand-900" }, "🔍 Quick Search ປຸ່ມຄົ້ນຫາດ່ວນອ້ອມຂ້າງ (Google Maps):"),
             React.createElement("div", { className: "flex flex-wrap gap-1.5" },
-              React.createElement("a", { href: `https://www.google.com/maps/search/office/@${mapSearchQuery},16z`, target: "_blank", className: "text-xs bg-white text-brand-900 border px-2.5 py-1 rounded hover:bg-gray-100 font-semibold" }, "🏢 ຄົ້ນຫາ ອໍຟິດ"),
-              React.createElement("a", { href: `https://www.google.com/maps/search/bank/@${mapSearchQuery},16z`, target: "_blank", className: "text-xs bg-white text-brand-900 border px-2.5 py-1 rounded hover:bg-gray-100 font-semibold" }, "🏦 ຄົ້ນຫາ ທະນາຄານ"),
-              React.createElement("a", { href: `https://www.google.com/maps/search/university/@${mapSearchQuery},16z`, target: "_blank", className: "text-xs bg-white text-brand-900 border px-2.5 py-1 rounded hover:bg-gray-100 font-semibold" }, "🎓 ມະຫາໄລ/ໂຮງຮຽນ"),
-              React.createElement("a", { href: `https://www.google.com/maps/search/coffee/@${mapSearchQuery},16z`, target: "_blank", className: "text-xs bg-white text-brand-900 border px-2.5 py-1 rounded hover:bg-gray-100 font-semibold" }, "☕ ຮ້ານກາເຟຄູ່ແຂ່ງ")
+              React.createElement("a", { href: `https://www.google.com/maps/search/office/@${mapSearchQuery},16z`, target: "_blank", className: "text-xs bg-white text-brand-900 border px-2.5 py-1 rounded hover:bg-gray-100 font-semibold shadow-sm" }, "🏢 ຄົ້ນຫາ ອໍຟິດ"),
+              React.createElement("a", { href: `https://www.google.com/maps/search/bank/@${mapSearchQuery},16z`, target: "_blank", className: "text-xs bg-white text-brand-900 border px-2.5 py-1 rounded hover:bg-gray-100 font-semibold shadow-sm" }, "🏦 ຄົ້ນຫາ ທະນາຄານ"),
+              React.createElement("a", { href: `https://www.google.com/maps/search/university/@${mapSearchQuery},16z`, target: "_blank", className: "text-xs bg-white text-brand-900 border px-2.5 py-1 rounded hover:bg-gray-100 font-semibold shadow-sm" }, "🎓 ມະຫາໄລ/ໂຮງຮຽນ"),
+              React.createElement("a", { href: `https://www.google.com/maps/search/coffee/@${mapSearchQuery},16z`, target: "_blank", className: "text-xs bg-white text-brand-900 border px-2.5 py-1 rounded hover:bg-gray-100 font-semibold shadow-sm" }, "☕ ຮ້ານກາເຟຄູ່ແຂ່ງ")
             )
           ),
 
           // Multi-Filter Checkboxes
           React.createElement("div", { className: "bg-brand-50 p-4 rounded-xl border border-brand-100 space-y-3" },
-            React.createElement("h3", { className: "text-xs font-bold text-brand-900 uppercase" }, "🎯 ເລືອກຕົວກັ່ນກອງສະແກນ (Multiple Filters):"),
+            React.createElement("h3", { className: "text-xs font-bold text-brand-900 uppercase" }, "🎯 ເລືອກຕົວກັ່ນກອງສະແກນ 500m (Multiple Filters):"),
             React.createElement("div", { className: "grid grid-cols-2 gap-2 text-xs" },
               [
                 { key: 'population', label: '🎓 ກຸ່ມປະຊາກອນ 18-40 ປີ' },
@@ -523,7 +507,7 @@ function App() {
         )
       ),
 
-      // TAB 2: BREAK EVEN & SCENARIOS + CHART.JS
+      // TAB 2: BREAK EVEN & SCENARIOS + CHART.JS (COMPLETE 100%)
       tab === 'breakeven' && React.createElement(BreakEvenSection, {
         data: paybackData,
         setData: (newData) => {
@@ -534,7 +518,7 @@ function App() {
         formatNum
       }),
 
-      // TAB 3: FULL RECIPE SUITE (100% RESTORED)
+      // TAB 3: FULL RECIPE SUITE (COMPLETE 100%)
       tab === 'recipe' && React.createElement(FullRecipeSuite, {
         ingredients, recipes, presets, categories,
         activeSopRecipe, setActiveSopRecipe,
@@ -650,11 +634,11 @@ function App() {
       )
     ),
 
-    // FIREBASE CLOUD INSPECTION MODAL
+    // FIREBASE INSPECTOR MODAL
     showFirebaseInspector && React.createElement("div", { className: "fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" },
       React.createElement("div", { className: "bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl" },
         React.createElement("div", { className: "flex justify-between items-center border-b pb-2" },
-          React.createElement("h3", { className: "font-bold text-base text-brand-900" }, "🧪 Firebase Cloud Status Inspector"),
+          React.createElement("h3", { className: "font-bold text-base text-brand-900" }, "🧪 Firebase Cloud Inspector"),
           React.createElement("button", { onClick: () => setShowFirebaseInspector(false), className: "text-gray-500 font-bold" }, "✕")
         ),
         React.createElement("div", { className: "space-y-3 text-xs" },
@@ -662,12 +646,11 @@ function App() {
             React.createElement("p", { className: "text-brand-900 font-bold" }, "Project ID: franchise-kpi"),
             React.createElement("p", { className: "text-green-600 font-bold mt-1" }, "Status: Connected Live (Firestore)")
           ),
-          React.createElement("p", { className: "font-bold text-gray-700" }, "📊 ຂໍ້ມູນທີ່ບັນທຶກຢູ່ໃນ Cloud ປະຈຸບັນ:"),
-          React.createElement("ul", { className: "space-y-2" },
+          React.createElement("ul", { className: "space-y-2 text-xs" },
             React.createElement("li", { className: "flex justify-between p-2 bg-brand-50 rounded" }, React.createElement("span", null, "📍 ລາຍການທຳເລ (Locations):"), React.createElement("b", null, locations.length + " ບ່ອນ")),
             React.createElement("li", { className: "flex justify-between p-2 bg-brand-50 rounded" }, React.createElement("span", null, "🍹 ສູດອາຫານ (Recipes):"), React.createElement("b", null, recipes.length + " ສູດ")),
             React.createElement("li", { className: "flex justify-between p-2 bg-brand-50 rounded" }, React.createElement("span", null, "📦 ຄັງວັດຖຸດິບ (Stock Items):"), React.createElement("b", null, ingredients.length + " ລາຍການ")),
-            React.createElement("li", { className: "flex justify-between p-2 bg-brand-50 rounded" }, React.createElement("span", null, "🏪 ພຣີເຊັດສາຂາ (Branch Presets):"), React.createElement("b", null, presets.length + " ສາຂາ"))
+            React.createElement("li", { className: "flex justify-between p-2 bg-brand-50 rounded" }, React.createElement("span", null, "🏪 ພຣີເຊັດສາຂາ (Presets):"), React.createElement("b", null, presets.length + " ສາຂາ"))
           )
         ),
         React.createElement("button", { onClick: () => setShowFirebaseInspector(false), className: "w-full bg-brand-500 text-white font-bold py-2 rounded-lg text-xs" }, "ຕົກລົງ")
@@ -682,7 +665,7 @@ function App() {
 }
 
 /* =========================================================================
-   BREAK EVEN COMPONENT WITH SCENARIO SIMULATION & CHART.JS GRAPH
+   BREAK EVEN COMPONENT WITH SCENARIOS & CHART.JS
    ========================================================================= */
 function BreakEvenSection({ data, setData, formatNum }) {
   const chartRef = useRef(null);
@@ -725,7 +708,7 @@ function BreakEvenSection({ data, setData, formatNum }) {
         labels: labels,
         datasets: [
           { label: 'ກະແສເງິນສົດສະສົມ (Cumulative Cash Flow)', data: cashFlowData, borderColor: '#1D6FB8', backgroundColor: 'rgba(29, 111, 184, 0.1)', fill: true, tension: 0.2, borderWidth: 2 },
-          { label: 'ຈຸດກຸ້ມທຶນ (0)', data: zeroLine, borderColor: '#EF4444', borderDash: [4, 4], pointRadius: 0, borderWidth: 1.5 }
+          { label: 'ຈຸດກຸ້ມທຶນ Break-Even (0)', data: zeroLine, borderColor: '#EF4444', borderDash: [4, 4], pointRadius: 0, borderWidth: 1.5 }
         ]
       },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
@@ -823,7 +806,7 @@ function BreakEvenSection({ data, setData, formatNum }) {
 }
 
 /* =========================================================================
-   FULL RECIPE SUITE COMPONENT (FULL 100% RESTORED)
+   FULL RECIPE SUITE COMPONENT
    ========================================================================= */
 function FullRecipeSuite({
   ingredients, recipes, presets, categories,
@@ -841,12 +824,14 @@ function FullRecipeSuite({
   const [bItems, setBItems] = useState([{ ingredientId: "", qty: "", unit: "g" }]);
   const [bSteps, setBSteps] = useState("");
   const [bNotes, setBNotes] = useState("");
+  const [bAttachedPresets, setBAttachedPresets] = useState({});
 
   const [ingName, setIngName] = useState("");
   const [ingUnit, setIngUnit] = useState("g");
 
   const [preName, setPreName] = useState("");
   const [preSelected, setPreSelected] = useState({});
+  const [editingPresetId, setEditingPresetId] = useState(null);
 
   useEffect(() => {
     if (editingRecipe) {
@@ -860,6 +845,12 @@ function FullRecipeSuite({
         return { ingredientId: found ? found.id : "", qty: it.qty, unit: it.unit };
       });
       setBItems(mapped.length ? mapped : [{ ingredientId: "", qty: "", unit: "g" }]);
+
+      const attached = {};
+      presets.forEach(p => {
+        if (p.recipeIds && p.recipeIds.includes(editingRecipe.id)) attached[p.id] = true;
+      });
+      setBAttachedPresets(attached);
     } else {
       setBName("");
       setBCategory(categories[0] || "");
@@ -867,8 +858,9 @@ function FullRecipeSuite({
       setBSteps("");
       setBNotes("");
       setBItems([{ ingredientId: "", qty: "", unit: "g" }]);
+      setBAttachedPresets({});
     }
-  }, [editingRecipe]);
+  }, [editingRecipe, presets]);
 
   const handleAddNewCategory = (e) => {
     e.preventDefault();
@@ -887,16 +879,39 @@ function FullRecipeSuite({
       const ing = ingredients.find(i => i.id === it.ingredientId);
       return { name: ing ? ing.name : "", qty: it.qty, unit: it.unit };
     });
+
+    const targetRecipeId = editingRecipe ? editingRecipe.id : uid("rec");
     
     let nextRecipes;
     if (editingRecipe) {
       nextRecipes = recipes.map(r => r.id === editingRecipe.id ? { ...r, name: bName.trim(), category: bCategory, servings: bServings, items: recipeItems, steps: bSteps, notes: bNotes } : r);
     } else {
-      nextRecipes = [{ id: uid("rec"), name: bName.trim(), category: bCategory || "ອື່ນໆ", servings: bServings, items: recipeItems, steps: bSteps, notes: bNotes, createdAt: Date.now() }, ...recipes];
+      nextRecipes = [{ id: targetRecipeId, name: bName.trim(), category: bCategory || "ອື່ນໆ", servings: bServings, items: recipeItems, steps: bSteps, notes: bNotes, createdAt: Date.now() }, ...recipes];
     }
-    saveRecipeSuiteToFirebase(null, nextRecipes, null, null);
+
+    const nextPresets = presets.map(p => {
+      const isChecked = !!bAttachedPresets[p.id];
+      let currentIds = p.recipeIds || [];
+      if (isChecked && !currentIds.includes(targetRecipeId)) {
+        return { ...p, recipeIds: [...currentIds, targetRecipeId] };
+      } else if (!isChecked && currentIds.includes(targetRecipeId)) {
+        return { ...p, recipeIds: currentIds.filter(id => id !== targetRecipeId) };
+      }
+      return p;
+    });
+
+    saveRecipeSuiteToFirebase(null, nextRecipes, nextPresets, null);
     setEditingRecipe(null);
     setRecipeSubTab("sop");
+  };
+
+  const handleDeleteRecipe = (id) => {
+    if (confirm("ທ່ານຕ້ອງການລຶບສູດນີ້ອອກຈາກ Cloud ແທ້ບໍ?")) {
+      const nextRecipes = recipes.filter(r => r.id !== id);
+      const nextPresets = presets.map(p => ({ ...p, recipeIds: (p.recipeIds || []).filter(recId => recId !== id) }));
+      saveRecipeSuiteToFirebase(null, nextRecipes, nextPresets, null);
+      if (activeSopRecipe && activeSopRecipe.id === id) setActiveSopRecipe(null);
+    }
   };
 
   const handleAddIngredient = (e) => {
@@ -908,12 +923,103 @@ function FullRecipeSuite({
     }
   };
 
+  const handleDeleteIngredient = (id) => {
+    if (confirm("ຕ້ອງການລຶບວັດຖຸດິບນີ້?")) {
+      const next = ingredients.filter(i => i.id !== id);
+      saveRecipeSuiteToFirebase(next, null, null, null);
+    }
+  };
+
   const handleSavePreset = () => {
     const selectedIds = Object.keys(preSelected).filter(id => preSelected[id]);
     if (!preName.trim() || selectedIds.length === 0) return alert("ກະລຸນາໃສ່ຊື່ສາຂາ ແລະ ເລືອກຢ່າງນ້ອຍ 1 ເມນູ");
-    const nextPresets = [{ id: uid("pre"), name: preName.trim(), recipeIds: selectedIds, createdAt: Date.now() }, ...presets];
+    
+    let nextPresets;
+    if (editingPresetId) {
+      nextPresets = presets.map(p => p.id === editingPresetId ? { ...p, name: preName.trim(), recipeIds: selectedIds } : p);
+    } else {
+      nextPresets = [{ id: uid("pre"), name: preName.trim(), recipeIds: selectedIds, createdAt: Date.now() }, ...presets];
+    }
+
     saveRecipeSuiteToFirebase(null, null, nextPresets, null);
-    setPreName(""); setPreSelected({});
+    setPreName(""); setPreSelected({}); setEditingPresetId(null);
+  };
+
+  const handleDeletePreset = (id) => {
+    if (confirm("ຕ້ອງການລຶບ ພຣີເຊັດສາຂານີ້?")) {
+      const nextPresets = presets.filter(p => p.id !== id);
+      saveRecipeSuiteToFirebase(null, null, nextPresets, null);
+    }
+  };
+
+  const exportTicket2ColPDF = () => {
+    const categoriesMap = {};
+    recipes.forEach(r => {
+      let cat = (r.category || "General").trim();
+      if (!categoriesMap[cat]) categoriesMap[cat] = [];
+      categoriesMap[cat].push(r);
+    });
+
+    const categoriesHtml = Object.keys(categoriesMap).map(catName => {
+      const list = categoriesMap[catName];
+      const cardsHtml = list.map(r => `
+        <div style="border: 1.5px solid #1D6FB8; border-radius: 8px; padding: 10px; background: #fff; page-break-inside: avoid; margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; border-bottom: 1.5px solid #1D6FB8; padding-bottom: 4px; margin-bottom: 6px;">
+            <b style="color: #124E85; font-size: 12px;">${r.name}</b>
+            <span style="font-size: 9px; background: #E2EEF8; color: #124E85; padding: 1px 6px; border-radius: 4px; font-weight: bold;">${r.servings || r.category}</span>
+          </div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 9.5px; margin-bottom: 6px;">
+            <thead>
+              <tr style="background: #f4f7fb; border-bottom: 1px solid #1D6FB8;">
+                <th style="text-align: left; padding: 2px;">ວັດຖຸດິບ</th>
+                <th style="text-align: right; padding: 2px;">ປະລິມານ</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${r.items.map(it => `
+                <tr style="border-bottom: 1px solid #E2EEF8;">
+                  <td style="padding: 2px;">${it.name}</td>
+                  <td style="text-align: right; font-weight: bold; padding: 2px;">${it.qty} ${it.unit}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          ${r.steps ? `
+            <div style="font-size: 8.5px; color: #0F2A43; background: #fafafa; padding: 4px; border-radius: 4px;">
+              <b>SOP ຂັ້ນຕອນ:</b><br/>${r.steps.replace(/\n/g, '<br/>')}
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+
+      return `
+        <div style="margin-bottom: 15px;">
+          <h2 style="background: #124E85; color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase;">📂 ໝວດໝູ່: ${catName}</h2>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            ${cardsHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const printableDiv = document.createElement("div");
+    printableDiv.className = "a4-document";
+    printableDiv.innerHTML = `
+      <div style="text-align: center; border-bottom: 2px solid #124E85; padding-bottom: 8px; margin-bottom: 12px;">
+        <h1 style="font-size: 18px; color: #124E85; margin: 0; font-weight: bold;">📜 ປຶ້ມໃບສູດອາຫານ Ticket Recipe Book (2 Columns)</h1>
+        <p style="font-size: 10px; color: #4C6C87; margin: 2px 0 0 0;">BrandCraft Executive Suite — Standard Operating Procedure Manual</p>
+      </div>
+      ${categoriesHtml}
+    `;
+
+    const opt = {
+      margin:       [8, 8, 8, 8],
+      filename:     `Recipe_Book_Tickets_2Column_${Date.now()}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(printableDiv).save();
   };
 
   return React.createElement("div", { className: "bg-white p-6 rounded-xl border shadow-sm space-y-6" },
@@ -922,12 +1028,15 @@ function FullRecipeSuite({
       React.createElement("div", { className: "flex gap-2" },
         [
           { id: "sop", label: "📋 SOP ພະນັກງານ" },
-          { id: "builder", label: editingRecipe ? "✏️ ແກ້ໄຂສູດ" : "➕ ສ້າງສູດໃໝ່" },
+          { id: "builder", label: editingRecipe ? "✏️ ແກ້ໄຂສູດ: " + editingRecipe.name : "➕ ສ້າງສູດໃໝ່" },
           { id: "ingredients", label: "📦 ຄັງວັດຖຸດິບ (" + ingredients.length + ")" },
           { id: "presets", label: "🏪 ພຣີເຊັດສາຂາ (" + presets.length + ")" }
         ].map(st => React.createElement("button", {
           key: st.id,
-          onClick: () => setRecipeSubTab(st.id),
+          onClick: () => {
+            if (st.id !== 'builder' && editingRecipe) setEditingRecipe(null);
+            setRecipeSubTab(st.id);
+          },
           className: `px-3 py-1.5 text-xs font-semibold rounded-lg border ${recipeSubTab === st.id ? 'bg-brand-500 text-white' : 'bg-gray-50'}`
         }, st.label))
       )
@@ -936,21 +1045,47 @@ function FullRecipeSuite({
     // SUB-TAB 1: SOP VIEW
     recipeSubTab === "sop" && React.createElement("div", { className: "grid grid-cols-1 lg:grid-cols-12 gap-6" },
       React.createElement("div", { className: "lg:col-span-5 space-y-3" },
-        React.createElement("input", { type: "text", placeholder: "🔍 ປ້ອນຊື່ສູດ...", value: search, onChange: e => setSearch(e.target.value), className: "w-full border rounded p-2 text-xs" }),
-        recipes.map(r => React.createElement("div", {
+        React.createElement("div", { className: "flex gap-2" },
+          React.createElement("input", { type: "text", placeholder: "🔍 ປ້ອນຊື່ສູດ...", value: search, onChange: e => setSearch(e.target.value), className: "w-full border rounded p-2 text-xs" }),
+          React.createElement("button", { onClick: exportTicket2ColPDF, className: "bg-green-600 text-white text-[11px] px-2.5 py-1 rounded font-bold whitespace-nowrap hover:bg-green-700 shadow" }, "📄 Export Ticket PDF (2 Col)")
+        ),
+        recipes.filter(r => r.name.toLowerCase().includes(search.toLowerCase())).map(r => React.createElement("div", {
           key: r.id,
           onClick: () => setActiveSopRecipe(r),
-          className: `p-3 rounded-lg border cursor-pointer ${activeSopRecipe && activeSopRecipe.id === r.id ? 'border-brand-500 bg-brand-50' : ''}`
+          className: `p-3 rounded-lg border cursor-pointer flex justify-between items-center ${activeSopRecipe && activeSopRecipe.id === r.id ? 'border-brand-500 bg-brand-50' : 'hover:bg-gray-50'}`
         },
-          React.createElement("h4", { className: "font-bold text-sm" }, r.name),
-          React.createElement("p", { className: "text-xs text-gray-500" }, r.items.length + " ສ່ວນປະສົມ")
+          React.createElement("div", null,
+            React.createElement("h4", { className: "font-bold text-sm text-brand-900" }, r.name),
+            React.createElement("p", { className: "text-xs text-gray-500" }, (r.category || 'General') + " · " + r.items.length + " ສ່ວນປະສົມ")
+          ),
+          React.createElement("div", { className: "flex gap-1" },
+            React.createElement("button", { onClick: (e) => { e.stopPropagation(); setEditingRecipe(r); setRecipeSubTab("builder"); }, className: "text-[11px] bg-brand-50 text-brand-500 px-2 py-1 rounded font-bold border hover:bg-brand-100" }, "✏️ ແກ້ໄຂ"),
+            React.createElement("button", { onClick: (e) => { e.stopPropagation(); handleDeleteRecipe(r.id); }, className: "text-[11px] bg-red-50 text-red-600 px-2 py-1 rounded font-bold border border-red-200 hover:bg-red-600 hover:text-white" }, "🗑️ ລຶບ")
+          )
         ))
       ),
       React.createElement("div", { className: "lg:col-span-7" },
-        activeSopRecipe ? React.createElement("div", { className: "sop-card space-y-3" },
-          React.createElement("h3", { className: "font-bold text-lg text-brand-900" }, activeSopRecipe.name),
-          React.createElement("ul", { className: "text-xs space-y-1" },
-            activeSopRecipe.items.map((it, i) => React.createElement("li", { key: i }, it.name + ": " + it.qty + " " + it.unit))
+        activeSopRecipe ? React.createElement("div", { className: "sop-card space-y-4" },
+          React.createElement("div", { className: "flex justify-between border-b pb-2" },
+            React.createElement("h3", { className: "font-bold text-lg text-brand-900" }, activeSopRecipe.name),
+            React.createElement("span", { className: "text-xs bg-brand-100 text-brand-900 font-bold px-2 py-0.5 rounded" }, activeSopRecipe.category)
+          ),
+          React.createElement("div", null,
+            React.createElement("h4", { className: "text-xs font-bold text-gray-700 uppercase mb-2" }, "📋 ອັດຕາສ່ວນປະສົມ"),
+            React.createElement("table", { className: "w-full text-xs" },
+              React.createElement("tbody", { className: "divide-y" },
+                activeSopRecipe.items.map((it, i) => React.createElement("tr", { key: i },
+                  React.createElement("td", { className: "py-1 font-medium" }, it.name),
+                  React.createElement("td", { className: "py-1 text-right font-bold text-brand-900" }, it.qty + " " + it.unit)
+                ))
+              )
+            )
+          ),
+          activeSopRecipe.steps && React.createElement("div", null,
+            React.createElement("h4", { className: "text-xs font-bold text-gray-700 uppercase mb-2" }, "💡 ຂັ້ນຕອນ SOP"),
+            React.createElement("div", { className: "text-xs space-y-1" },
+              activeSopRecipe.steps.split('\n').filter(s=>s.trim()).map((st, idx) => React.createElement("div", { key: idx, className: "p-2 bg-gray-50 rounded border" }, (idx+1) + ". " + st))
+            )
           )
         ) : React.createElement("p", { className: "text-gray-400 py-12 text-center" }, "ເລືອກສູດເພື່ອເບິ່ງ SOP")
       )
@@ -964,6 +1099,20 @@ function FullRecipeSuite({
           categories.map(c => React.createElement("option", { key: c, value: c }, c))
         ),
         React.createElement("input", { type: "text", value: bServings, onChange: e => setBServings(e.target.value), placeholder: "ຂະໜາດ: ຈອກ 22oz", className: "w-full border rounded p-2 text-xs" })
+      ),
+
+      presets.length > 0 && React.createElement("div", { className: "bg-blue-50 p-3 rounded-lg border border-brand-100 space-y-2" },
+        React.createElement("label", { className: "block text-xs font-bold text-brand-900" }, "🏪 ເລືອກຜູກສູດນີ້ເຂົ້າກັບ ພຣີເຊັດສາຂາ (Assign to Branch Presets):"),
+        React.createElement("div", { className: "flex flex-wrap gap-3 text-xs" },
+          presets.map(p => React.createElement("label", { key: p.id, className: "flex items-center gap-1.5 bg-white px-2.5 py-1 rounded border cursor-pointer" },
+            React.createElement("input", {
+              type: "checkbox",
+              checked: !!bAttachedPresets[p.id],
+              onChange: () => setBAttachedPresets({ ...bAttachedPresets, [p.id]: !bAttachedPresets[p.id] })
+            }),
+            React.createElement("span", { className: "font-semibold" }, p.name)
+          ))
+        )
       ),
 
       React.createElement("div", { className: "space-y-2" },
@@ -1008,7 +1157,11 @@ function FullRecipeSuite({
       ),
 
       React.createElement("textarea", { rows: "3", value: bSteps, onChange: e => setBSteps(e.target.value), placeholder: "ຂັ້ນຕອນ SOP...", className: "w-full border rounded p-2 text-xs" }),
-      React.createElement("button", { onClick: handleSaveRecipe, className: "bg-brand-500 text-white px-5 py-2.5 text-xs font-bold rounded shadow hover:bg-brand-600" }, "☁️ ບັນທຶກສູດຂຶ້ນ Firebase Cloud")
+      
+      React.createElement("div", { className: "flex justify-end gap-2" },
+        editingRecipe && React.createElement("button", { onClick: () => { setEditingRecipe(null); setRecipeSubTab("sop"); }, className: "bg-gray-200 text-xs font-bold px-4 py-2 rounded" }, "ຍົກເລີກ"),
+        React.createElement("button", { onClick: handleSaveRecipe, className: "bg-brand-500 text-white px-5 py-2.5 text-xs font-bold rounded shadow hover:bg-brand-600" }, editingRecipe ? "☁️ ອັບເດດສູດຂຶ້ນ Firebase Cloud" : "☁️ ບັນທຶກສູດຂຶ້ນ Firebase Cloud")
+      )
     ),
 
     // SUB-TAB 3: INGREDIENTS
@@ -1016,7 +1169,10 @@ function FullRecipeSuite({
       React.createElement("div", { className: "peg-grid" },
         ingredients.map(ing => React.createElement("div", { key: ing.id, className: "peg" },
           React.createElement("span", null, ing.name),
-          React.createElement("span", { className: "unit-tag" }, ing.unit)
+          React.createElement("div", { className: "flex items-center gap-2" },
+            React.createElement("span", { className: "unit-tag" }, ing.unit),
+            ing.custom && React.createElement("button", { onClick: () => handleDeleteIngredient(ing.id), className: "text-red-600 text-xs font-bold" }, "✕")
+          )
         ))
       ),
       React.createElement("form", { onSubmit: handleAddIngredient, className: "flex gap-2 border-t pt-3" },
@@ -1031,10 +1187,10 @@ function FullRecipeSuite({
     // SUB-TAB 4: PRESETS
     recipeSubTab === "presets" && React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6" },
       React.createElement("div", { className: "space-y-3" },
-        React.createElement("h3", { className: "font-bold text-sm text-brand-900" }, "ສ້າງພຣີເຊັດສາຂາໃໝ່"),
-        React.createElement("input", { type: "text", placeholder: "ຊື່ສາຂາ/ຮ້ານ...", value: preName, onChange: e => setPreName(e.target.value), className: "w-full border rounded p-2 text-xs" }),
+        React.createElement("h3", { className: "font-bold text-sm text-brand-900" }, editingPresetId ? "✏️ ແກ້ໄຂພຣີເຊັດສາຂາ" : "🏪 ສ້າງພຣີເຊັດສາຂາໃໝ່"),
+        React.createElement("input", { type: "text", placeholder: "ຊື່ສາຂາ/ຮ້ານ...", value: preName, onChange: e => setPreName(e.target.value), className: "w-full border rounded p-2 text-xs font-bold" }),
         React.createElement("div", { className: "border rounded p-2 max-h-48 overflow-y-auto space-y-1 text-xs" },
-          recipes.map(r => React.createElement("label", { key: r.id, className: "flex items-center gap-2 py-1 cursor-pointer" },
+          recipes.map(r => React.createElement("label", { key: r.id, className: "flex items-center gap-2 py-1 cursor-pointer hover:bg-gray-50 p-1 rounded" },
             React.createElement("input", {
               type: "checkbox",
               checked: !!preSelected[r.id],
@@ -1043,14 +1199,35 @@ function FullRecipeSuite({
             React.createElement("span", null, r.name)
           ))
         ),
-        React.createElement("button", { onClick: handleSavePreset, className: "w-full bg-brand-500 text-white text-xs py-2 rounded font-bold" }, "☁️ ບັນທຶກພຣີເຊັດຂຶ້ນ Cloud")
+        React.createElement("div", { className: "flex gap-2" },
+          editingPresetId && React.createElement("button", { onClick: () => { setEditingPresetId(null); setPreName(""); setPreSelected({}); }, className: "bg-gray-200 text-xs font-bold px-3 py-2 rounded" }, "ຍົກເລີກ"),
+          React.createElement("button", { onClick: handleSavePreset, className: "flex-1 bg-brand-500 text-white text-xs py-2 rounded font-bold shadow" }, editingPresetId ? "☁️ ອັບເດດພຣີເຊັດ" : "☁️ ບັນທຶກພຣີເຊັດຂຶ້ນ Cloud")
+        )
       ),
       React.createElement("div", { className: "space-y-2" },
         React.createElement("h3", { className: "font-bold text-sm text-brand-900" }, "ລາຍການພຣີເຊັດສາຂາ"),
         presets.length === 0 ? React.createElement("p", { className: "text-xs text-gray-400" }, "ຍັງບໍ່ມີພຣີເຊັດ") :
-        presets.map(p => React.createElement("div", { key: p.id, className: "p-3 border rounded-lg bg-gray-50" },
-          React.createElement("h4", { className: "font-bold text-xs text-brand-900" }, p.name),
-          React.createElement("p", { className: "text-[11px] text-gray-500 mt-1" }, p.recipeIds.length + " ເມນູໃນສາຂານີ້")
+        presets.map(p => React.createElement("div", { key: p.id, className: "p-3 border rounded-lg bg-gray-50 flex justify-between items-start" },
+          React.createElement("div", null,
+            React.createElement("h4", { className: "font-bold text-xs text-brand-900" }, p.name),
+            React.createElement("p", { className: "text-[11px] text-gray-500 mt-1" }, (p.recipeIds || []).length + " ເມນູໃນສາຂານີ້")
+          ),
+          React.createElement("div", { className: "flex gap-1" },
+            React.createElement("button", {
+              onClick: () => {
+                setEditingPresetId(p.id);
+                setPreName(p.name);
+                const selected = {};
+                (p.recipeIds || []).forEach(id => selected[id] = true);
+                setPreSelected(selected);
+              },
+              className: "text-[11px] bg-white text-brand-500 border px-2 py-0.5 rounded font-bold hover:bg-brand-50"
+            }, "✏️ ແກ້ໄຂ"),
+            React.createElement("button", {
+              onClick: () => handleDeletePreset(p.id),
+              className: "text-[11px] bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded font-bold hover:bg-red-600 hover:text-white"
+            }, "🗑️ ລຶບ")
+          )
         ))
       )
     )
