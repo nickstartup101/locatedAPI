@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BrandCraft Executive Suite & Recipe Cloud System</title>
+    <title>BrandCraft Executive Suite - All-In-One Full Suite</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -152,6 +152,7 @@ const DEFAULT_WEIGHTS = { construction: 35, system: 20, recipe: 15, branding: 15
 function uid(prefix){ return prefix + "-" + Date.now() + "-" + Math.random().toString(36).slice(2,6); }
 function formatNum(num) { return Math.round(num || 0).toLocaleString('en-US'); }
 
+/* DYNAMIC GIS SPATIAL DENSITY ENGINE */
 function getDynamicGISScanFromCoords(lat, lng, activeFilters) {
     const centerLat = 17.9638;
     const centerLng = 102.6111;
@@ -185,6 +186,19 @@ function getGradeInfo(score) {
     if (score >= 65) return { grade: "B", text: "ເໝາະສົມ (Good Location)", color: "text-blue-700 bg-blue-50 border-blue-200" };
     if (score >= 50) return { grade: "C", text: "ປານກາງ (ຕ້ອງມີການຕະຫຼາດ ເສີມ)", color: "text-yellow-700 bg-yellow-50 border-yellow-200" };
     return { grade: "D", text: "ສ່ຽງສູງ ບໍ່ຄຸ້ມຄ່າ (High Risk)", color: "text-red-700 bg-red-50 border-red-200" };
+}
+
+function generateToolPDF(containerId, filename) {
+    const element = document.getElementById(containerId);
+    if (!element) return alert("ບໍ່ພົບຂໍ້ມູນ Report");
+    const opt = {
+      margin:       [8, 8, 8, 8],
+      filename:     `${filename}_${Date.now()}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
 }
 
 /* =========================================================================
@@ -235,7 +249,7 @@ function InteractivePinMap({ lat, lng, onPinChange }) {
 }
 
 /* =========================================================================
-   MAIN APP COMPONENT WITH FIREBASE INSPECTOR
+   MAIN APP COMPONENT
    ========================================================================= */
 function App() {
   const [tab, setTab] = useState("location");
@@ -243,7 +257,7 @@ function App() {
   const [showFirebaseInspector, setShowFirebaseInspector] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
-  // Pin & Scanner States
+  // Location Pin & Scanner States
   const [locations, setLocations] = useState([]);
   const [pinLat, setPinLat] = useState(17.9651);
   const [pinLng, setPinLng] = useState(102.6141);
@@ -253,7 +267,7 @@ function App() {
   // Financial States
   const [paybackData, setPaybackData] = useState({ capex: 120000000, opex: 15000000, dailySales: 1500000, cogsPercent: 40 });
   
-  // Recipe Suite States (Restored 100%)
+  // Recipe Suite States
   const [recipeSubTab, setRecipeSubTab] = useState("sop");
   const [ingredients, setIngredients] = useState(DEFAULT_INGREDIENTS);
   const [recipes, setRecipes] = useState([]);
@@ -306,7 +320,7 @@ function App() {
     } catch(e) { setFirebaseStatus("offline"); }
   }, []);
 
-  // Recalculate Franchise
+  // Recalculate Franchise Costs
   useEffect(() => {
     let computedTotal = totalFranchiseCost;
     const inputVal = Number(baseInputValue) || 0;
@@ -352,6 +366,8 @@ function App() {
   const autoScorePreview = calculateAutoLocationScore(locForm);
   const gradePreview = getGradeInfo(autoScorePreview);
 
+  const mapSearchQuery = encodeURIComponent(`${pinLat.toFixed(4)},${pinLng.toFixed(4)}`);
+
   return React.createElement("div", { className: "min-h-screen flex flex-col" },
     
     // Top Bar Header
@@ -365,7 +381,7 @@ function App() {
               className: `text-[10px] px-2 py-0.5 rounded-full font-bold ${firebaseStatus === 'online' ? 'bg-green-500 text-white' : 'bg-yellow-500 text-black'}`
             }, firebaseStatus === 'online' ? '🟢 Cloud Sync Active' : '🟡 Offline Mode')
           ),
-          React.createElement("p", { className: "text-xs text-brand-100" }, "Project: franchise-kpi | Firebase Realtime Database Integrated")
+          React.createElement("p", { className: "text-xs text-brand-100" }, "Project: franchise-kpi | ລະບົບປະເມີນທຳເລ, ຈຸດກຸ້ມທຶນ & Recipe SOP Suite")
         )
       ),
       React.createElement("div", { className: "flex gap-2" },
@@ -383,8 +399,8 @@ function App() {
     // Navigation Tabs
     React.createElement("nav", { className: "bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10 flex overflow-x-auto no-print" },
       [
-        { id: 'location', label: '1. ປະເມີນທຳເລ (Dynamic GIS Map)' },
-        { id: 'breakeven', label: '2. ຄຳນວນ Break-Even' },
+        { id: 'location', label: '1. ປະເມີນທຳເລ + GIS Map' },
+        { id: 'breakeven', label: '2. ຄຳນວນ Break-Even & ຈຳລອງ' },
         { id: 'recipe', label: '3. Recipe SOP Suite (' + recipes.length + ')' },
         { id: 'compare', label: '4. ບັນທຶກ & ປຽບທຽບທຳເລ (' + locations.length + ')' },
         { id: 'franchise', label: '5. ຄິດໄລ່ Franchise (Dropdown)' }
@@ -398,21 +414,86 @@ function App() {
     // Main App Container
     React.createElement("main", { className: "flex-1 max-w-7xl w-full mx-auto p-6" },
       
-      // TAB 1: GIS LOCATION SCANNER
+      // TAB 1: GIS LOCATION SCANNER & AI PROMPT BUILDER
       tab === 'location' && React.createElement("div", { className: "grid grid-cols-1 lg:grid-cols-12 gap-6" },
         React.createElement("div", { className: "lg:col-span-7 bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4" },
-          React.createElement("h2", { className: "text-lg font-bold text-brand-900 border-b pb-2" }, "1. ປະເມີນທຳເລ & ປັກໝຸດແຜນທີ່ (Interactive GIS Map)"),
+          React.createElement("div", { className: "border-b pb-2 flex justify-between items-center" },
+            React.createElement("h2", { className: "text-lg font-bold text-brand-900" }, "1. ປະເມີນທຳເລ & ປັກໝຸດແຜນທີ່ (Interactive GIS Engine)"),
+            React.createElement("span", { className: "text-xs bg-green-100 text-green-800 px-2.5 py-1 rounded font-bold border border-green-300" }, "📍 Drag & Drop Pin")
+          ),
           
           React.createElement("div", null,
             React.createElement("label", { className: "block text-xs font-semibold mb-1" }, "1. ຊື່ສະຖານທີ່ / ທຳເລໂຄງການ *"),
             React.createElement("input", { type: "text", value: locForm.name, onChange: e => setLocForm({...locForm, name: e.target.value}), placeholder: "ເຊັ່ນ: ສາຂາ ດົງໂດກ", className: "w-full border rounded-lg p-2.5 text-sm" })
           ),
 
+          // Interactive Map Box
           React.createElement(InteractivePinMap, { lat: pinLat, lng: pinLng, onPinChange: handlePinMoved }),
 
-          React.createElement("button", { onClick: saveLocationAnalysis, className: "w-full bg-brand-500 text-white font-bold py-3 rounded-lg shadow hover:bg-brand-600 transition" }, "☁️ ບັນທຶກຜົນການປະເມີນຂຶ້ນ Cloud Database")
+          // Quick Search Buttons
+          React.createElement("div", { className: "bg-blue-50 p-3 rounded-xl border border-brand-100 space-y-2" },
+            React.createElement("span", { className: "text-xs font-bold text-brand-900" }, "🔍 Quick Search ປຸ່ມຄົ້ນຫາດ່ວນອ້ອມຂ້າງ ( Google Maps ):"),
+            React.createElement("div", { className: "flex flex-wrap gap-1.5" },
+              React.createElement("a", { href: `https://www.google.com/maps/search/office/@${mapSearchQuery},16z`, target: "_blank", className: "text-xs bg-white text-brand-900 border px-2.5 py-1 rounded hover:bg-gray-100 font-semibold" }, "🏢 ຄົ້ນຫາ ອໍຟິດ"),
+              React.createElement("a", { href: `https://www.google.com/maps/search/bank/@${mapSearchQuery},16z`, target: "_blank", className: "text-xs bg-white text-brand-900 border px-2.5 py-1 rounded hover:bg-gray-100 font-semibold" }, "🏦 ຄົ້ນຫາ ທະນາຄານ"),
+              React.createElement("a", { href: `https://www.google.com/maps/search/university/@${mapSearchQuery},16z`, target: "_blank", className: "text-xs bg-white text-brand-900 border px-2.5 py-1 rounded hover:bg-gray-100 font-semibold" }, "🎓 ມະຫາໄລ/ໂຮງຮຽນ"),
+              React.createElement("a", { href: `https://www.google.com/maps/search/coffee/@${mapSearchQuery},16z`, target: "_blank", className: "text-xs bg-white text-brand-900 border px-2.5 py-1 rounded hover:bg-gray-100 font-semibold" }, "☕ ຮ້ານກາເຟຄູ່ແຂ່ງ")
+            )
+          ),
+
+          // Multi-Filter Checkboxes
+          React.createElement("div", { className: "bg-brand-50 p-4 rounded-xl border border-brand-100 space-y-3" },
+            React.createElement("h3", { className: "text-xs font-bold text-brand-900 uppercase" }, "🎯 ເລືອກຕົວກັ່ນກອງສະແກນ (Multiple Filters):"),
+            React.createElement("div", { className: "grid grid-cols-2 gap-2 text-xs" },
+              [
+                { key: 'population', label: '🎓 ກຸ່ມປະຊາກອນ 18-40 ປີ' },
+                { key: 'offices', label: '🏢 ຕຶກອໍຟິດ & ສຳນັກງານ' },
+                { key: 'banks', label: '🏦 ທະນາຄານ & ATM' },
+                { key: 'competitors', label: '☕ ຮ້ານກາເຟຄູ່ແຂ່ງ' }
+              ].map(item => React.createElement("label", { key: item.key, className: "flex items-center gap-2 bg-white p-2 rounded border cursor-pointer hover:bg-gray-50" },
+                React.createElement("input", {
+                  type: "checkbox",
+                  checked: !!scanFilters[item.key],
+                  onChange: () => {
+                    const newF = { ...scanFilters, [item.key]: !scanFilters[item.key] };
+                    setScanFilters(newF);
+                    const updatedVals = getDynamicGISScanFromCoords(pinLat, pinLng, newF);
+                    setLocForm(prev => ({ ...prev, ...updatedVals }));
+                  }
+                }),
+                React.createElement("span", { className: "font-semibold text-gray-800" }, item.label)
+              ))
+            )
+          ),
+
+          // Step 3 Auto Weighted Score Values
+          React.createElement("div", { className: "bg-white p-4 rounded-xl border space-y-3" },
+            React.createElement("h3", { className: "text-xs font-bold text-brand-900 border-b pb-1 uppercase" }, "3. ຜົນການສະແກນ ແລະ ຄະແນນນ້ຳໜັກ (Auto Dynamic Scoring)"),
+            
+            React.createElement("div", { className: "grid grid-cols-2 gap-3 text-xs" },
+              React.createElement("div", null,
+                React.createElement("label", { className: "block font-semibold mb-1" }, "ກຸ່ມເປົ້າໝາຍ (18-40 ປີ) [30%]"),
+                React.createElement("input", { type: "text", readOnly: true, value: `${locForm.popTarget} / 10`, className: "w-full border rounded p-1.5 bg-gray-100 font-bold text-brand-900" })
+              ),
+              React.createElement("div", null,
+                React.createElement("label", { className: "block font-semibold mb-1" }, "ຄົນຍ່າງຜ່ານ Foot Traffic [25%]"),
+                React.createElement("input", { type: "text", readOnly: true, value: `${locForm.traffic} / 10`, className: "w-full border rounded p-1.5 bg-gray-100 font-bold text-brand-900" })
+              ),
+              React.createElement("div", null,
+                React.createElement("label", { className: "block font-semibold mb-1" }, "ສຳນັກງານ & ທະນາຄານ [20%]"),
+                React.createElement("input", { type: "text", readOnly: true, value: `ອໍຟິດ ${locForm.offices} | ຕູ້ ${locForm.banks}`, className: "w-full border rounded p-1.5 bg-gray-100 font-bold text-brand-900" })
+              ),
+              React.createElement("div", null,
+                React.createElement("label", { className: "block font-semibold mb-1 text-red-600" }, "ຄູ່ແຂ່ງຂັນ Penalty [-10%]"),
+                React.createElement("input", { type: "text", readOnly: true, value: `${locForm.competition} / 10`, className: "w-full border rounded p-1.5 bg-red-50 text-red-700 font-bold" })
+              )
+            )
+          ),
+
+          React.createElement("button", { onClick: saveLocationAnalysis, className: "w-full bg-brand-500 text-white font-bold py-3 rounded-lg shadow hover:bg-brand-600 transition" }, "💾 ບັນທຶກຜົນການປະເມີນຂຶ້ນ Cloud Database")
         ),
 
+        // Auto Score & AI Prompt Panel
         React.createElement("div", { className: "lg:col-span-5 space-y-4" },
           React.createElement("div", { className: "bg-brand-900 text-white p-6 rounded-xl shadow-md text-center" },
             React.createElement("p", { className: "text-xs text-brand-100 uppercase tracking-widest" }, "Automatic Location Score"),
@@ -420,11 +501,29 @@ function App() {
             React.createElement("div", { className: `inline-block px-3 py-1 rounded-full text-xs font-bold mt-2 ${gradePreview.color}` },
               "Grade " + gradePreview.grade + " — " + gradePreview.text
             )
+          ),
+
+          // AI Prompt Generator Box
+          React.createElement("div", { className: "bg-white p-5 rounded-xl border space-y-2" },
+            React.createElement("h3", { className: "text-xs font-bold text-brand-900 flex items-center gap-1" }, "🤖 AI Assistant Prompt Builder:"),
+            React.createElement("p", { className: "text-[11px] text-gray-500" }, "ກັອບປີ້ Prompt ນີ້ໄປວາງໃສ່ ChatGPT/Gemini ເພື່ອໃຫ້ AI ຊ່ວຍວິເຄາະທຳເລ:"),
+            React.createElement("textarea", {
+              readOnly: true,
+              className: "w-full h-32 bg-gray-50 border rounded p-2 text-xs font-mono text-gray-700 select-all",
+              value: `ຊ່ວຍວິເຄາະທຳເລໂຄງການ: "${locForm.name || 'ບໍ່ລະບຸ'}" (ພິກັດ: ${pinLat.toFixed(4)}, ${pinLng.toFixed(4)})
+- ຄວາມໜາແໜ້ນອໍຟິດ/ສຳນັກງານ: ${locForm.offices}/10
+- ສະຖາບັນການເງິນ/ທະນາຄານ: ${locForm.banks}/10
+- ກຸ່ມປະຊາກອນ 18-40 ປີ: ${locForm.popTarget}/10
+- ປະລິມານຄົນຍ່າງຜ່ານ (Traffic): ${locForm.traffic}/10
+- ຄວາມໜາແໜ້ນຄູ່ແຂ່ງ: ${locForm.competition}/10
+
+ກະລຸນາວິເຄາະ: 1) ຈຸດແຂງ/ຈຸດອ່ອນ 2) ກົນຢຸດການດຶງດູດພະນັກງານອໍຟິດ 3) ຄຳແນະນຳເພີ່ມເຕີມ`
+            })
           )
         )
       ),
 
-      // TAB 2: BREAK EVEN
+      // TAB 2: BREAK EVEN & SCENARIOS + CHART.JS
       tab === 'breakeven' && React.createElement(BreakEvenSection, {
         data: paybackData,
         setData: (newData) => {
@@ -583,48 +682,148 @@ function App() {
 }
 
 /* =========================================================================
-   BREAK EVEN COMPONENT
+   BREAK EVEN COMPONENT WITH SCENARIO SIMULATION & CHART.JS GRAPH
    ========================================================================= */
 function BreakEvenSection({ data, setData, formatNum }) {
+  const chartRef = useRef(null);
+  const chartInstance = useRef(null);
+
   const marginRatio = 1 - (data.cogsPercent / 100);
   const monthlySales = data.dailySales * 30;
   const grossProfit = monthlySales * marginRatio;
   const netProfit = grossProfit - data.opex;
+  const breakEvenDailySales = Math.ceil((data.opex / 30) / marginRatio);
   const paybackMonths = netProfit > 0 ? (data.capex / netProfit).toFixed(1) : '∞';
 
-  return React.createElement("div", { className: "grid grid-cols-1 lg:grid-cols-12 gap-6" },
-    React.createElement("div", { className: "lg:col-span-5 bg-white p-6 rounded-xl border space-y-4" },
-      React.createElement("h2", { className: "text-base font-bold text-brand-900 border-b pb-2" }, "ຄຳນວນຈຸດກຸ້ມທຶນ (Break-Even Inputs)"),
-      React.createElement("div", null,
-        React.createElement("label", { className: "block text-xs font-semibold mb-1" }, "CAPEX ຕົ້ນທຶນກໍ່ສ້າງເລີ່ມຕົ້ນ"),
-        React.createElement("input", { type: "number", value: data.capex, onChange: e => setData({...data, capex: Number(e.target.value)}), className: "w-full border rounded p-2 text-right text-sm" })
+  const pessDailySales = data.dailySales * 0.7;
+  const pessNetProfit = (pessDailySales * 30 * marginRatio) - data.opex;
+  const pessPayback = pessNetProfit > 0 ? (data.capex / pessNetProfit).toFixed(1) + " ເດືອນ" : "ຂາດທຶນ";
+
+  const optDailySales = data.dailySales * 1.3;
+  const optNetProfit = (optDailySales * 30 * marginRatio) - data.opex;
+  const optPayback = optNetProfit > 0 ? (data.capex / optNetProfit).toFixed(1) + " ເດືອນ" : "ຂາດທຶນ";
+
+  useEffect(() => {
+    if (!chartRef.current) return;
+    const ctx = chartRef.current.getContext('2d');
+    if (chartInstance.current) chartInstance.current.destroy();
+
+    const monthsToPlot = Math.min(Math.max(Math.ceil(Number(paybackMonths) * 1.5 || 12), 6), 24);
+    const labels = [];
+    const cashFlowData = [];
+    const zeroLine = [];
+
+    for (let m = 0; m <= monthsToPlot; m++) {
+      labels.push(`ເດືອນ ${m}`);
+      cashFlowData.push(-data.capex + (netProfit * m));
+      zeroLine.push(0);
+    }
+
+    chartInstance.current = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          { label: 'ກະແສເງິນສົດສະສົມ (Cumulative Cash Flow)', data: cashFlowData, borderColor: '#1D6FB8', backgroundColor: 'rgba(29, 111, 184, 0.1)', fill: true, tension: 0.2, borderWidth: 2 },
+          { label: 'ຈຸດກຸ້ມທຶນ (0)', data: zeroLine, borderColor: '#EF4444', borderDash: [4, 4], pointRadius: 0, borderWidth: 1.5 }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    return () => { if (chartInstance.current) chartInstance.current.destroy(); };
+  }, [data, netProfit, paybackMonths]);
+
+  return React.createElement("div", { className: "space-y-6" },
+    React.createElement("div", { className: "grid grid-cols-1 lg:grid-cols-12 gap-6" },
+      React.createElement("div", { className: "lg:col-span-5 bg-white p-6 rounded-xl border space-y-4" },
+        React.createElement("h2", { className: "text-base font-bold text-brand-900 border-b pb-2" }, "ຄຳນວນຈຸດກຸ້ມທຶນ (Break-Even Inputs)"),
+        React.createElement("div", null,
+          React.createElement("label", { className: "block text-xs font-semibold mb-1" }, "CAPEX ຕົ້ນທຶນກໍ່ສ້າງເລີ່ມຕົ້ນ"),
+          React.createElement("input", { type: "number", value: data.capex, onChange: e => setData({...data, capex: Number(e.target.value)}), className: "w-full border rounded p-2 text-right text-sm font-bold" })
+        ),
+        React.createElement("div", null,
+          React.createElement("label", { className: "block text-xs font-semibold mb-1" }, "OPEX ຄ່າໃຊ້ຈ່າຍຄົງທີ່/ເດືອນ"),
+          React.createElement("input", { type: "number", value: data.opex, onChange: e => setData({...data, opex: Number(e.target.value)}), className: "w-full border rounded p-2 text-right text-sm font-bold" })
+        ),
+        React.createElement("div", null,
+          React.createElement("label", { className: "block text-xs font-semibold mb-1" }, "ຍອດຂາຍສະເລ່ຍ/ມື້"),
+          React.createElement("input", { type: "number", value: data.dailySales, onChange: e => setData({...data, dailySales: Number(e.target.value)}), className: "w-full border rounded p-2 text-right text-sm font-bold" })
+        ),
+        React.createElement("div", null,
+          React.createElement("label", { className: "block text-xs font-semibold mb-1" }, "ຕົ້ນທຶນສິນຄ້າ COGS (%)"),
+          React.createElement("input", { type: "number", value: data.cogsPercent, onChange: e => setData({...data, cogsPercent: Number(e.target.value)}), className: "w-full border rounded p-2 text-right text-sm font-bold" })
+        )
       ),
-      React.createElement("div", null,
-        React.createElement("label", { className: "block text-xs font-semibold mb-1" }, "OPEX ຄ່າໃຊ້ຈ່າຍຄົງທີ່/ເດືອນ"),
-        React.createElement("input", { type: "number", value: data.opex, onChange: e => setData({...data, opex: Number(e.target.value)}), className: "w-full border rounded p-2 text-right text-sm" })
-      ),
-      React.createElement("div", null,
-        React.createElement("label", { className: "block text-xs font-semibold mb-1" }, "ຍອດຂາຍສະເລ່ຍ/ມື້"),
-        React.createElement("input", { type: "number", value: data.dailySales, onChange: e => setData({...data, dailySales: Number(e.target.value)}), className: "w-full border rounded p-2 text-right text-sm" })
+
+      React.createElement("div", { className: "lg:col-span-7 bg-white p-6 rounded-xl border flex flex-col justify-between space-y-4" },
+        React.createElement("div", { className: "grid grid-cols-2 gap-4" },
+          React.createElement("div", { className: "bg-brand-900 p-4 rounded-xl text-white" },
+            React.createElement("p", { className: "text-xs text-brand-100" }, "Payback Period (ໄລຍະເວລາຄືນທຶນ)"),
+            React.createElement("p", { className: "text-3xl font-extrabold text-yellow-400 mt-1" }, paybackMonths + " ເດືອນ")
+          ),
+          React.createElement("div", { className: "bg-brand-50 p-4 rounded-xl border" },
+            React.createElement("p", { className: "text-xs font-semibold text-brand-900" }, "ກຳໄລສຸດທິຄາດການ / ເດືອນ"),
+            React.createElement("p", { className: "text-2xl font-bold text-brand-900 mt-1" }, formatNum(netProfit))
+          )
+        ),
+        React.createElement("div", { className: "text-xs space-y-1.5 border-t pt-3" },
+          React.createElement("div", { className: "flex justify-between" }, React.createElement("span", { className: "text-gray-600" }, "ຍອດຂາຍສະເລ່ຍ/ເດືອນ:"), React.createElement("b", null, formatNum(monthlySales))),
+          React.createElement("div", { className: "flex justify-between" }, React.createElement("span", { className: "text-gray-600" }, "ກຳໄລຂັ້ນຕົ້ນ (Gross Profit):"), React.createElement("b", null, formatNum(grossProfit))),
+          React.createElement("div", { className: "flex justify-between text-brand-900 border-t pt-2" }, React.createElement("span", { className: "font-bold" }, "ຍອດຂາຍຂັ້ນຕ່ຳ/ມື້ ເພື່ອກຸ້ມທຶນ:"), React.createElement("b", { className: "text-brand-500 font-bold" }, formatNum(breakEvenDailySales)))
+        )
       )
     ),
-    React.createElement("div", { className: "lg:col-span-7 bg-white p-6 rounded-xl border flex flex-col justify-between" },
-      React.createElement("div", { className: "grid grid-cols-2 gap-4" },
-        React.createElement("div", { className: "bg-brand-900 p-4 rounded-xl text-white" },
-          React.createElement("p", { className: "text-xs text-brand-100" }, "Payback Period"),
-          React.createElement("p", { className: "text-3xl font-extrabold text-yellow-400 mt-1" }, paybackMonths + " ເດືອນ")
-        ),
-        React.createElement("div", { className: "bg-brand-50 p-4 rounded-xl border" },
-          React.createElement("p", { className: "text-xs font-semibold text-brand-900" }, "ກຳໄລສຸດທິ/ເດືອນ"),
-          React.createElement("p", { className: "text-2xl font-bold text-brand-900 mt-1" }, formatNum(netProfit))
+
+    // Scenario Analysis Table
+    React.createElement("div", { className: "bg-white p-6 rounded-xl border space-y-3" },
+      React.createElement("h3", { className: "text-sm font-bold text-brand-900 border-b pb-2" }, "📊 ຕາຕະລາງຈຳລອງສະຖານະການ (Scenario Simulation)"),
+      React.createElement("div", { className: "overflow-x-auto" },
+        React.createElement("table", { className: "w-full text-xs border-collapse" },
+          React.createElement("thead", { className: "bg-brand-50 text-brand-900 font-bold" },
+            React.createElement("tr", null,
+              React.createElement("th", { className: "p-2.5 text-left" }, "ສະຖານະການ (Scenario)"),
+              React.createElement("th", { className: "p-2.5 text-right" }, "ຍອດຂາຍ/ມື້"),
+              React.createElement("th", { className: "p-2.5 text-right" }, "ກຳໄລສຸດທິ/ເດືອນ"),
+              React.createElement("th", { className: "p-2.5 text-center" }, "ໄລຍະເວລາຄືນທຶນ")
+            )
+          ),
+          React.createElement("tbody", { className: "divide-y" },
+            React.createElement("tr", null,
+              React.createElement("td", { className: "p-2.5 font-bold text-red-600" }, "1. ຂາດທຶນ (Pessimistic - 70%)"),
+              React.createElement("td", { className: "p-2.5 text-right font-medium" }, formatNum(pessDailySales)),
+              React.createElement("td", { className: "p-2.5 text-right font-bold text-red-600" }, formatNum(pessNetProfit)),
+              React.createElement("td", { className: "p-2.5 text-center font-bold" }, pessPayback)
+            ),
+            React.createElement("tr", { className: "bg-yellow-50" },
+              React.createElement("td", { className: "p-2.5 font-bold text-yellow-800" }, "2. ຈຸດກຸ້ມທຶນ (Break-Even Minimum)"),
+              React.createElement("td", { className: "p-2.5 text-right font-medium" }, formatNum(breakEvenDailySales)),
+              React.createElement("td", { className: "p-2.5 text-right font-bold" }, "0"),
+              React.createElement("td", { className: "p-2.5 text-center font-bold" }, "ກຸ້ມຄ່າໃຊ້ຈ່າຍ")
+            ),
+            React.createElement("tr", null,
+              React.createElement("td", { className: "p-2.5 font-bold text-green-600" }, "3. ກຳໄລດີ (Optimistic - 130%)"),
+              React.createElement("td", { className: "p-2.5 text-right font-medium" }, formatNum(optDailySales)),
+              React.createElement("td", { className: "p-2.5 text-right font-bold text-green-600" }, formatNum(optNetProfit)),
+              React.createElement("td", { className: "p-2.5 text-center font-bold" }, optPayback)
+            )
+          )
         )
+      )
+    ),
+
+    // Cumulative Cashflow Chart
+    React.createElement("div", { className: "bg-white p-6 rounded-xl border space-y-3" },
+      React.createElement("h3", { className: "text-sm font-bold text-brand-900 border-b pb-2" }, "📈 ແຜນພູມກະແສເງິນສົດສະສົມ (Cumulative Cash Flow Graph)"),
+      React.createElement("div", { className: "h-64 relative" },
+        React.createElement("canvas", { ref: chartRef })
       )
     )
   );
 }
 
 /* =========================================================================
-   FULL RECIPE SUITE COMPONENT (FULL 100% FEATURES RESTORED)
+   FULL RECIPE SUITE COMPONENT (FULL 100% RESTORED)
    ========================================================================= */
 function FullRecipeSuite({
   ingredients, recipes, presets, categories,
@@ -760,15 +959,15 @@ function FullRecipeSuite({
     // SUB-TAB 2: BUILDER
     recipeSubTab === "builder" && React.createElement("div", { className: "space-y-4" },
       React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-3" },
-        React.createElement("input", { type: "text", value: bName, onChange: e => setBName(e.target.value), placeholder: "ຊື່ສູດອາຫານ *", className: "w-full border rounded p-2 text-xs" }),
-        React.createElement("select", { value: bCategory, onChange: e => setBCategory(e.target.value), className: "w-full border rounded p-2 text-xs" },
+        React.createElement("input", { type: "text", value: bName, onChange: e => setBName(e.target.value), placeholder: "ຊື່ສູດອາຫານ *", className: "w-full border rounded p-2 text-xs font-semibold" }),
+        React.createElement("select", { value: bCategory, onChange: e => setBCategory(e.target.value), className: "w-full border rounded p-2 text-xs font-semibold" },
           categories.map(c => React.createElement("option", { key: c, value: c }, c))
         ),
         React.createElement("input", { type: "text", value: bServings, onChange: e => setBServings(e.target.value), placeholder: "ຂະໜາດ: ຈອກ 22oz", className: "w-full border rounded p-2 text-xs" })
       ),
 
       React.createElement("div", { className: "space-y-2" },
-        React.createElement("label", { className: "block text-xs font-semibold" }, "ສ່ວນປະສົມໃນສູດ"),
+        React.createElement("label", { className: "block text-xs font-semibold text-gray-700" }, "ສ່ວນປະສົມໃນສູດ (Ingredients Rows)"),
         bItems.map((it, idx) => React.createElement("div", { key: idx, className: "flex gap-2 items-center" },
           React.createElement("select", {
             value: it.ingredientId,
@@ -792,7 +991,7 @@ function FullRecipeSuite({
               next[idx] = { ...next[idx], qty: e.target.value };
               setBItems(next);
             },
-            className: "w-24 border rounded p-2 text-xs text-right"
+            className: "w-24 border rounded p-2 text-xs text-right font-bold"
           }),
           React.createElement("select", {
             value: it.unit,
@@ -801,7 +1000,7 @@ function FullRecipeSuite({
               next[idx] = { ...next[idx], unit: e.target.value };
               setBItems(next);
             },
-            className: "w-20 border rounded p-2 text-xs"
+            className: "w-20 border rounded p-2 text-xs font-bold"
           }, UNIT_OPTIONS.map(u => React.createElement("option", { key: u, value: u }, u))),
           React.createElement("button", { onClick: () => setBItems(bItems.filter((_, i) => i !== idx)), disabled: bItems.length === 1, className: "text-red-600 font-bold px-2" }, "✕")
         )),
