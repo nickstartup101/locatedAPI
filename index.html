@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BrandCraft Executive Suite - All-In-One Full Suite</title>
+    <title>BrandCraft Executive Suite & Recipe Cloud System</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Noto Sans Lao & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Lao:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Lao:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Leaflet.js (Free Interactive Map) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -244,17 +244,14 @@ function App() {
   const [showFirebaseInspector, setShowFirebaseInspector] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
-  // Location Pin & Scanner States
   const [locations, setLocations] = useState([]);
   const [pinLat, setPinLat] = useState(17.9651);
   const [pinLng, setPinLng] = useState(102.6141);
   const [locForm, setLocForm] = useState({ name: 'ສາຂາ ດົງໂດກ (ໜ້າ STB)', mapUrl: '17.9651, 102.6141', offices: 8, banks: 6, popTarget: 10, traffic: 7, facility: 8, competition: 4 });
   const [scanFilters, setScanFilters] = useState({ population: true, offices: true, banks: true, competitors: true });
 
-  // Financial States
   const [paybackData, setPaybackData] = useState({ capex: 120000000, opex: 15000000, dailySales: 1500000, cogsPercent: 40 });
   
-  // Recipe Suite States
   const [recipeSubTab, setRecipeSubTab] = useState("sop");
   const [ingredients, setIngredients] = useState(DEFAULT_INGREDIENTS);
   const [recipes, setRecipes] = useState([]);
@@ -264,7 +261,6 @@ function App() {
   const [sopCheckedSteps, setSopCheckedSteps] = useState({});
   const [editingRecipe, setEditingRecipe] = useState(null);
   
-  // Franchise States
   const [weights, setWeights] = useState(DEFAULT_WEIGHTS);
   const [totalFranchiseCost, setTotalFranchiseCost] = useState(250000000);
   const [selectedBaseKey, setSelectedBaseKey] = useState("total");
@@ -398,7 +394,7 @@ function App() {
     // Main App Container
     React.createElement("main", { className: "flex-1 max-w-7xl w-full mx-auto p-6" },
       
-      // TAB 1: GIS LOCATION SCANNER & AI PROMPT BUILDER (COMPLETE 100%)
+      // TAB 1: GIS LOCATION SCANNER
       tab === 'location' && React.createElement("div", { className: "grid grid-cols-1 lg:grid-cols-12 gap-6" },
         React.createElement("div", { className: "lg:col-span-7 bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4" },
           React.createElement("div", { className: "border-b pb-2 flex justify-between items-center" },
@@ -411,10 +407,8 @@ function App() {
             React.createElement("input", { type: "text", value: locForm.name, onChange: e => setLocForm({...locForm, name: e.target.value}), placeholder: "ເຊັ່ນ: ສາຂາ ດົງໂດກ", className: "w-full border rounded-lg p-2.5 text-sm font-semibold" })
           ),
 
-          // Interactive Map Box
           React.createElement(InteractivePinMap, { lat: pinLat, lng: pinLng, onPinChange: handlePinMoved }),
 
-          // Quick Search Buttons
           React.createElement("div", { className: "bg-blue-50 p-3 rounded-xl border border-brand-100 space-y-2" },
             React.createElement("span", { className: "text-xs font-bold text-brand-900" }, "🔍 Quick Search ປຸ່ມຄົ້ນຫາດ່ວນອ້ອມຂ້າງ (Google Maps):"),
             React.createElement("div", { className: "flex flex-wrap gap-1.5" },
@@ -425,7 +419,6 @@ function App() {
             )
           ),
 
-          // Multi-Filter Checkboxes
           React.createElement("div", { className: "bg-brand-50 p-4 rounded-xl border border-brand-100 space-y-3" },
             React.createElement("h3", { className: "text-xs font-bold text-brand-900 uppercase" }, "🎯 ເລືອກຕົວກັ່ນກອງສະແກນ 500m (Multiple Filters):"),
             React.createElement("div", { className: "grid grid-cols-2 gap-2 text-xs" },
@@ -450,10 +443,8 @@ function App() {
             )
           ),
 
-          // Step 3 Auto Weighted Score Values
           React.createElement("div", { className: "bg-white p-4 rounded-xl border space-y-3" },
             React.createElement("h3", { className: "text-xs font-bold text-brand-900 border-b pb-1 uppercase" }, "3. ຜົນການສະແກນ ແລະ ຄະແນນນ້ຳໜັກ (Auto Dynamic Scoring)"),
-            
             React.createElement("div", { className: "grid grid-cols-2 gap-3 text-xs" },
               React.createElement("div", null,
                 React.createElement("label", { className: "block font-semibold mb-1" }, "ກຸ່ມເປົ້າໝາຍ (18-40 ປີ) [30%]"),
@@ -477,7 +468,6 @@ function App() {
           React.createElement("button", { onClick: saveLocationAnalysis, className: "w-full bg-brand-500 text-white font-bold py-3 rounded-lg shadow hover:bg-brand-600 transition" }, "💾 ບັນທຶກຜົນການປະເມີນຂຶ້ນ Cloud Database")
         ),
 
-        // Auto Score & AI Prompt Panel
         React.createElement("div", { className: "lg:col-span-5 space-y-4" },
           React.createElement("div", { className: "bg-brand-900 text-white p-6 rounded-xl shadow-md text-center" },
             React.createElement("p", { className: "text-xs text-brand-100 uppercase tracking-widest" }, "Automatic Location Score"),
@@ -487,7 +477,6 @@ function App() {
             )
           ),
 
-          // AI Prompt Generator Box
           React.createElement("div", { className: "bg-white p-5 rounded-xl border space-y-2" },
             React.createElement("h3", { className: "text-xs font-bold text-brand-900 flex items-center gap-1" }, "🤖 AI Assistant Prompt Builder:"),
             React.createElement("p", { className: "text-[11px] text-gray-500" }, "ກັອບປີ້ Prompt ນີ້ໄປວາງໃສ່ ChatGPT/Gemini ເພື່ອໃຫ້ AI ຊ່ວຍວິເຄາະທຳເລ:"),
@@ -507,7 +496,7 @@ function App() {
         )
       ),
 
-      // TAB 2: BREAK EVEN & SCENARIOS + CHART.JS (COMPLETE 100%)
+      // TAB 2: BREAK EVEN & SCENARIOS + CHART.JS
       tab === 'breakeven' && React.createElement(BreakEvenSection, {
         data: paybackData,
         setData: (newData) => {
@@ -518,7 +507,7 @@ function App() {
         formatNum
       }),
 
-      // TAB 3: FULL RECIPE SUITE (COMPLETE 100%)
+      // TAB 3: FULL RECIPE SUITE
       tab === 'recipe' && React.createElement(FullRecipeSuite, {
         ingredients, recipes, presets, categories,
         activeSopRecipe, setActiveSopRecipe,
@@ -579,11 +568,13 @@ function App() {
         )
       ),
 
-      // TAB 5: FRANCHISE CALCULATOR
+      // TAB 5: FRANCHISE CALCULATOR WITH PROMINENT GRAND TOTAL SUMMARY
       tab === 'franchise' && React.createElement("div", { className: "bg-white p-6 rounded-xl border shadow-sm space-y-6" },
         React.createElement("h2", { className: "text-xl font-bold text-brand-900 border-b pb-4" }, "5. ເຄື່ອງມືຄິດໄລ່ຕົ້ນທຶນແຟນຊາຍ (Dropdown Base Estimator)"),
+        
+        // Dropdown Base Selector Box
         React.createElement("div", { className: "bg-brand-50 p-4 rounded-xl border border-brand-100 space-y-3" },
-          React.createElement("label", { className: "block text-xs font-bold text-brand-900 uppercase" }, "📌 ເລືອກຕົ້ນທຶນອ້າງອີງເບື້ອງຕົ້ນ:"),
+          React.createElement("label", { className: "block text-xs font-bold text-brand-900 uppercase" }, "📌 ເລືອກຕົ້ນທຶນອ້າງອີງເບື້ອງຕົ້ນ (Known Starting Cost Base):"),
           React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4" },
             React.createElement("select", {
               value: selectedBaseKey,
@@ -613,6 +604,20 @@ function App() {
             )
           )
         ),
+
+        // 💎 PROMINENT GRAND TOTAL BANNER (NEWLY ENHANCED TOTAL SUMMARY)
+        React.createElement("div", { className: "p-6 bg-brand-900 text-white rounded-2xl shadow-lg border border-brand-500 flex flex-wrap justify-between items-center gap-4" },
+          React.createElement("div", null,
+            React.createElement("p", { className: "text-xs text-brand-100 font-bold uppercase tracking-widest" }, "💎 ລວມຍອດຕົ້ນທຶນງົບປະມານແຟນຊາຍທັງໝົດ (TOTAL FRANCHISE INVESTMENT)"),
+            React.createElement("p", { className: "text-4xl font-black text-yellow-400 mt-1" }, formatNum(totalFranchiseCost)),
+            React.createElement("p", { className: "text-[11px] text-brand-100 mt-1" }, "ຄິດໄລ່ລວມທັງໝົດ 6 ໝວດຕົ້ນທຶນຕາມສັດສ່ວນນ້ຳໜັກ (%) ຢ່າງສົມບູນ")
+          ),
+          React.createElement("div", { className: "text-right" },
+            React.createElement("span", { className: "inline-block bg-brand-500 text-white px-4 py-2 rounded-xl font-extrabold text-sm shadow" }, "100% Weighted Total Sum")
+          )
+        ),
+
+        // Items Grid
         React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4" },
           [
             { key: 'construction', label: 'ການກໍ່ສ້າງ (Construction)', icon: '🏗️' },
@@ -1091,7 +1096,7 @@ function FullRecipeSuite({
       )
     ),
 
-    // SUB-TAB 2: BUILDER
+    // SUB-TAB 2: BUILDER (WITH PRESET ATTACHMENT)
     recipeSubTab === "builder" && React.createElement("div", { className: "space-y-4" },
       React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-3" },
         React.createElement("input", { type: "text", value: bName, onChange: e => setBName(e.target.value), placeholder: "ຊື່ສູດອາຫານ *", className: "w-full border rounded p-2 text-xs font-semibold" }),
