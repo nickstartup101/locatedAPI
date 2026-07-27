@@ -18,8 +18,6 @@
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- html2pdf.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <!-- React 18 & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -67,7 +65,6 @@
         .peg { border: 1px solid var(--line); background: #fafafa; border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; }
         .unit-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; background: var(--blue); color: #fff; padding: 1px 6px; border-radius: 12px; }
 
-        .a4-document { width: 210mm; min-height: 297mm; padding: 15mm; margin: auto; background: #ffffff; font-size: 11px; color: #0F2A43; line-height: 1.5; }
         #leaflet-map { width: 100%; height: 260px; border-radius: 12px; z-index: 1; }
 
         @media print {
@@ -109,40 +106,8 @@ const DEFAULT_INGREDIENTS = [
   {id:"def-6", name:"ກາເຟຂົ້ວກາງ 1ກລ", unit:"g", custom:false},
   {id:"def-7", name:"ກາເຟຂົ້ວເຂັ້ມ 1ກລ", unit:"g", custom:false},
   {id:"def-8", name:"ວິບປິ້ງ Anchor", unit:"ml", custom:false},
-  {id:"def-9", name:"ວິບຄຣີມມີ່", unit:"ml", custom:false},
-  {id:"def-10", name:"ອັນຊັນ", unit:"g", custom:false},
-  {id:"def-11", name:"ມັດຊະ", unit:"g", custom:false},
-  {id:"def-12", name:"ຊາໄທ", unit:"g", custom:false},
-  {id:"def-13", name:"ຊາຂຽວ", unit:"g", custom:false},
-  {id:"def-14", name:"ປີໂປ້", unit:"ໜ່ວຍ", custom:false},
-  {id:"def-15", name:"ນ້ຳລິ້ນຈີ່", unit:"ml", custom:false},
-  {id:"def-16", name:"ບີສຄອຟ", unit:"g", custom:false},
-  {id:"def-17", name:"ນ້ຳເເດງ", unit:"ml", custom:false},
-  {id:"def-18", name:"ນ້ຳເຜິ້ງ", unit:"ml", custom:false},
-  {id:"def-19", name:"ນ້ຳຕານເຊື່ອມ", unit:"ml", custom:false},
-  {id:"def-20", name:"ນ້ຳເຊື່ອມເມເປີ້ນ", unit:"ml", custom:false},
-  {id:"def-21", name:"ໄຊຣັບມິ້ນ", unit:"ml", custom:false},
-  {id:"def-22", name:"ໂຊດາ", unit:"ml", custom:false},
-  {id:"def-23", name:"ເຈລາຕີນ", unit:"g", custom:false},
-  {id:"def-24", name:"ວິບປີ້ງຄຣີມເເບບບີບ", unit:"ml", custom:false},
-  {id:"def-25", name:"ວິບປິ້ງຄຣີມ CCN", unit:"g", custom:false},
-  {id:"def-26", name:"ນົມໂອດ", unit:"ml", custom:false},
-  {id:"def-27", name:"ນົມຟ້າ", unit:"ml", custom:false},
-  {id:"def-28", name:"ນົມຜົງ", unit:"g", custom:false},
   {id:"def-29", name:"ນົມສົດ 2000g", unit:"ml", custom:false},
-  {id:"def-30", name:"ນົມຄາເນຊັນ", unit:"ml", custom:false},
-  {id:"def-31", name:"ນົມຂຸ້ນ 2000g", unit:"g", custom:false},
-  {id:"def-32", name:"ນົມ AROMA ເເດງ", unit:"ml", custom:false},
-  {id:"def-33", name:"ນົມ AROMA ເຫຼືອງ", unit:"ml", custom:false},
-  {id:"def-34", name:"ໄຊຣັບຄາລາເມລ", unit:"ml", custom:false},
-  {id:"def-35", name:"ຊອດຄາຣາເມວ", unit:"ml", custom:false},
-  {id:"def-36", name:"ນິວເທລ້າ 1ກລ", unit:"g", custom:false},
-  {id:"def-37", name:"ຊາເອີເກຣ", unit:"g", custom:false},
-  {id:"def-38", name:"ຊາໄທ", unit:"g", custom:false},
-  {id:"def-39", name:"ໝາກພ້າວ", unit:"ໜ່ວຍ", custom:false},
-  {id:"def-40", name:"ໝາກນາວ", unit:"ໜ່ວຍ", custom:false},
-  {id:"def-41", name:"ເລມ້ອນ", unit:"ໜ່ວຍ", custom:false},
-  {id:"def-42", name:"ສະໄປ໋", unit:"ml", custom:false}
+  {id:"def-31", name:"ນົມຂຸ້ນ 2000g", unit:"g", custom:false}
 ];
 
 const DEFAULT_CATEGORIES = ["Coffee", "Non coffee", "Matcha", "Tea", "Fresh drink"];
@@ -152,7 +117,6 @@ const DEFAULT_WEIGHTS = { construction: 35, system: 20, recipe: 15, branding: 15
 function uid(prefix){ return prefix + "-" + Date.now() + "-" + Math.random().toString(36).slice(2,6); }
 function formatNum(num) { return Math.round(num || 0).toLocaleString('en-US'); }
 
-/* DYNAMIC GIS SPATIAL DENSITY ENGINE */
 function getDynamicGISScanFromCoords(lat, lng, activeFilters) {
     const centerLat = 17.9638;
     const centerLng = 102.6111;
@@ -188,9 +152,54 @@ function getGradeInfo(score) {
     return { grade: "D", text: "ສ່ຽງສູງ ບໍ່ຄຸ້ມຄ່າ (High Risk)", color: "text-red-700 bg-red-50 border-red-200" };
 }
 
-/* =========================================================================
-   INTERACTIVE MAP COMPONENT
-   ========================================================================= */
+/* FOOLPROOF NATIVE VECTOR PDF ENGINE */
+function printHtmlToA4PDF(docTitle, contentHtml) {
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(`
+        <!DOCTYPE html>
+        <html lang="lo">
+        <head>
+            <meta charset="UTF-8">
+            <title>${docTitle}</title>
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+            <style>
+                @page { size: A4 portrait; margin: 8mm; }
+                * { box-sizing: border-box !important; margin: 0; padding: 0; }
+                body { font-family: 'Noto Sans Lao', sans-serif !important; color: #0F2A43; background: #ffffff; font-size: 11px; line-height: 1.4; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                .pdf-body { width: 100%; max-width: 194mm; margin: 0 auto; }
+            </style>
+        </head>
+        <body>
+            <div class="pdf-body">
+                ${contentHtml}
+            </div>
+        </body>
+        </html>
+    `);
+    doc.close();
+
+    iframe.contentWindow.focus();
+    setTimeout(() => {
+        iframe.contentWindow.print();
+        setTimeout(() => {
+            if (document.body.contains(iframe)) document.body.removeChild(iframe);
+        }, 3000);
+    }, 600);
+}
+
+/* INTERACTIVE MAP COMPONENT */
 function InteractivePinMap({ lat, lng, onPinChange }) {
     const mapContainerRef = useRef(null);
     const mapInstance = useRef(null);
@@ -252,6 +261,7 @@ function App() {
 
   const [paybackData, setPaybackData] = useState({ capex: 120000000, opex: 15000000, dailySales: 1500000, cogsPercent: 40 });
   
+  // Recipe Suite States
   const [recipeSubTab, setRecipeSubTab] = useState("sop");
   const [ingredients, setIngredients] = useState(DEFAULT_INGREDIENTS);
   const [recipes, setRecipes] = useState([]);
@@ -266,6 +276,21 @@ function App() {
   const [selectedBaseKey, setSelectedBaseKey] = useState("total");
   const [baseInputValue, setBaseInputValue] = useState(250000000);
   const [franchiseItems, setFranchiseItems] = useState({});
+
+  // QUOTATION STATES
+  const [quoteHeader, setQuoteHeader] = useState({
+    title: "ໃບສະເໜີລາຄາອຸປະກອນ & ວັດຖຸດິບ (QUOTATION)",
+    customerName: "ຮ້ານ Chisehouse",
+    quoteNo: "QT-" + Date.now().toString().slice(-6),
+    date: new Date().toISOString().split('T')[0],
+    notes: "1. ລາຄານີ້ຢືນຢັນພາຍໃນ 15 ວັນ.\n2. ຊຳລະເງິນມັດຈຳ 50% ກ່ອນເລີ່ມດຳເນີນງານ."
+  });
+  const [quoteItems, setQuoteItems] = useState([
+    { id: uid("qti"), name: "ເຄື່ອງຊົງກາເຟ 2 ຫົວຊົງ Commercial Grade", qty: 1, price: 45000000 },
+    { id: uid("qti"), name: "ເຄື່ອງບົດກາເຟອັດຕະໂນມັດ On-Demand", qty: 1, price: 12000000 },
+    { id: uid("qti"), name: "ຊຸດຈອກ & ອຸປະກອນບາຣິສຕາຄົບຊຸດ", qty: 1, price: 8500000 }
+  ]);
+  const [quoteDiscount, setQuoteDiscount] = useState(2000000);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -299,6 +324,14 @@ function App() {
           }
         }
       });
+      db.collection("franchise_data").doc("quotation").onSnapshot(doc => {
+        if (doc.exists) {
+          const d = doc.data();
+          if (d.header) setQuoteHeader(d.header);
+          if (d.items) setQuoteItems(d.items);
+          if (d.discount !== undefined) setQuoteDiscount(d.discount);
+        }
+      });
     } catch(e) { setFirebaseStatus("offline"); }
   }, []);
 
@@ -321,6 +354,16 @@ function App() {
     });
     setFranchiseItems(calculated);
   }, [baseInputValue, selectedBaseKey, weights]);
+
+  const saveQuotationToFirebase = (newHeader, newItems, newDisc) => {
+    const updateObj = {
+      header: newHeader || quoteHeader,
+      items: newItems || quoteItems,
+      discount: newDisc !== undefined ? newDisc : quoteDiscount
+    };
+    db.collection("franchise_data").doc("quotation").set(updateObj, { merge: true });
+    showToast("☁️ ບັນທຶກໃບສະເໜີລາຄາຂຶ້ນ Cloud ແລ້ວ!");
+  };
 
   const handlePinMoved = (newLat, newLng) => {
     setPinLat(newLat);
@@ -361,7 +404,7 @@ function App() {
               className: `text-[10px] px-2 py-0.5 rounded-full font-bold ${firebaseStatus === 'online' ? 'bg-green-500 text-white' : 'bg-yellow-500 text-black'}`
             }, firebaseStatus === 'online' ? '🟢 Cloud Sync Active' : '🟡 Offline Mode')
           ),
-          React.createElement("p", { className: "text-xs text-brand-100" }, "Project: franchise-kpi | ລະບົບປະເມີນທຳເລ, ຈຸດກຸ້ມທຶນ & Recipe SOP Suite")
+          React.createElement("p", { className: "text-xs text-brand-100" }, "Project: franchise-kpi | ລະບົບປະເມີນທຳເລ, ຈຸດກຸ້ມທຶນ, Recipe & Quotation Generator")
         )
       ),
       React.createElement("div", { className: "flex gap-2" },
@@ -376,14 +419,15 @@ function App() {
       )
     ),
 
-    // Navigation Tabs
+    // Navigation Tabs (6 MENUS)
     React.createElement("nav", { className: "bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10 flex overflow-x-auto no-print" },
       [
-        { id: 'location', label: '1. ປະເມີນທຳເລ (Dynamic GIS Map & 500m)' },
-        { id: 'breakeven', label: '2. ຄຳນວນ Break-Even & ຈຳລອງ 3 ຢ່າງ' },
+        { id: 'location', label: '1. ປະເມີນທຳເລ (Dynamic GIS)' },
+        { id: 'breakeven', label: '2. ຄຳນວນ Break-Even' },
         { id: 'recipe', label: '3. Recipe SOP Suite (' + recipes.length + ')' },
         { id: 'compare', label: '4. ບັນທຶກ & ປຽບທຽບທຳເລ (' + locations.length + ')' },
-        { id: 'franchise', label: '5. ຄິດໄລ່ Franchise (Dropdown)' }
+        { id: 'franchise', label: '5. ຄິດໄລ່ Franchise' },
+        { id: 'quotation', label: '6. ອອກໃບສະເໜີລາຄາ (Quotation)' }
       ].map(t => React.createElement("button", {
         key: t.id,
         onClick: () => setTab(t.id),
@@ -496,7 +540,7 @@ function App() {
         )
       ),
 
-      // TAB 2: BREAK EVEN & SCENARIOS + CHART.JS
+      // TAB 2: BREAK EVEN
       tab === 'breakeven' && React.createElement(BreakEvenSection, {
         data: paybackData,
         setData: (newData) => {
@@ -568,13 +612,11 @@ function App() {
         )
       ),
 
-      // TAB 5: FRANCHISE CALCULATOR WITH PROMINENT GRAND TOTAL SUMMARY
+      // TAB 5: FRANCHISE CALCULATOR
       tab === 'franchise' && React.createElement("div", { className: "bg-white p-6 rounded-xl border shadow-sm space-y-6" },
         React.createElement("h2", { className: "text-xl font-bold text-brand-900 border-b pb-4" }, "5. ເຄື່ອງມືຄິດໄລ່ຕົ້ນທຶນແຟນຊາຍ (Dropdown Base Estimator)"),
-        
-        // Dropdown Base Selector Box
         React.createElement("div", { className: "bg-brand-50 p-4 rounded-xl border border-brand-100 space-y-3" },
-          React.createElement("label", { className: "block text-xs font-bold text-brand-900 uppercase" }, "📌 ເລືອກຕົ້ນທຶນອ້າງອີງເບື້ອງຕົ້ນ (Known Starting Cost Base):"),
+          React.createElement("label", { className: "block text-xs font-bold text-brand-900 uppercase" }, "📌 ເລືອກຕົ້ນທຶນອ້າງອີງເບື້ອງຕົ້ນ:"),
           React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4" },
             React.createElement("select", {
               value: selectedBaseKey,
@@ -604,20 +646,14 @@ function App() {
             )
           )
         ),
-
-        // 💎 PROMINENT GRAND TOTAL BANNER (NEWLY ENHANCED TOTAL SUMMARY)
         React.createElement("div", { className: "p-6 bg-brand-900 text-white rounded-2xl shadow-lg border border-brand-500 flex flex-wrap justify-between items-center gap-4" },
           React.createElement("div", null,
             React.createElement("p", { className: "text-xs text-brand-100 font-bold uppercase tracking-widest" }, "💎 ລວມຍອດຕົ້ນທຶນງົບປະມານແຟນຊາຍທັງໝົດ (TOTAL FRANCHISE INVESTMENT)"),
             React.createElement("p", { className: "text-4xl font-black text-yellow-400 mt-1" }, formatNum(totalFranchiseCost)),
             React.createElement("p", { className: "text-[11px] text-brand-100 mt-1" }, "ຄິດໄລ່ລວມທັງໝົດ 6 ໝວດຕົ້ນທຶນຕາມສັດສ່ວນນ້ຳໜັກ (%) ຢ່າງສົມບູນ")
           ),
-          React.createElement("div", { className: "text-right" },
-            React.createElement("span", { className: "inline-block bg-brand-500 text-white px-4 py-2 rounded-xl font-extrabold text-sm shadow" }, "100% Weighted Total Sum")
-          )
+          React.createElement("span", { className: "inline-block bg-brand-500 text-white px-4 py-2 rounded-xl font-extrabold text-sm shadow" }, "100% Weighted Total Sum")
         ),
-
-        // Items Grid
         React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4" },
           [
             { key: 'construction', label: 'ການກໍ່ສ້າງ (Construction)', icon: '🏗️' },
@@ -636,7 +672,18 @@ function App() {
             )
           ))
         )
-      )
+      ),
+
+      // TAB 6: QUOTATION GENERATOR
+      tab === 'quotation' && React.createElement(QuotationSection, {
+        header: quoteHeader,
+        setHeader: (newH) => { setQuoteHeader(newH); saveQuotationToFirebase(newH, null, null); },
+        items: quoteItems,
+        setItems: (newI) => { setQuoteItems(newI); saveQuotationToFirebase(null, newI, null); },
+        discount: quoteDiscount,
+        setDiscount: (newD) => { setQuoteDiscount(newD); saveQuotationToFirebase(null, null, newD); },
+        formatNum
+      })
     ),
 
     // FIREBASE INSPECTOR MODAL
@@ -654,8 +701,7 @@ function App() {
           React.createElement("ul", { className: "space-y-2 text-xs" },
             React.createElement("li", { className: "flex justify-between p-2 bg-brand-50 rounded" }, React.createElement("span", null, "📍 ລາຍການທຳເລ (Locations):"), React.createElement("b", null, locations.length + " ບ່ອນ")),
             React.createElement("li", { className: "flex justify-between p-2 bg-brand-50 rounded" }, React.createElement("span", null, "🍹 ສູດອາຫານ (Recipes):"), React.createElement("b", null, recipes.length + " ສູດ")),
-            React.createElement("li", { className: "flex justify-between p-2 bg-brand-50 rounded" }, React.createElement("span", null, "📦 ຄັງວັດຖຸດິບ (Stock Items):"), React.createElement("b", null, ingredients.length + " ລາຍການ")),
-            React.createElement("li", { className: "flex justify-between p-2 bg-brand-50 rounded" }, React.createElement("span", null, "🏪 ພຣີເຊັດສາຂາ (Presets):"), React.createElement("b", null, presets.length + " ສາຂາ"))
+            React.createElement("li", { className: "flex justify-between p-2 bg-brand-50 rounded" }, React.createElement("span", null, "📄 ໃບສະເໜີລາຄາ (Quotation Items):"), React.createElement("b", null, quoteItems.length + " ລາຍການ"))
           )
         ),
         React.createElement("button", { onClick: () => setShowFirebaseInspector(false), className: "w-full bg-brand-500 text-white font-bold py-2 rounded-lg text-xs" }, "ຕົກລົງ")
@@ -763,7 +809,6 @@ function BreakEvenSection({ data, setData, formatNum }) {
       )
     ),
 
-    // Scenario Analysis Table
     React.createElement("div", { className: "bg-white p-6 rounded-xl border space-y-3" },
       React.createElement("h3", { className: "text-sm font-bold text-brand-900 border-b pb-2" }, "📊 ຕາຕະລາງຈຳລອງສະຖານະການ (Scenario Simulation)"),
       React.createElement("div", { className: "overflow-x-auto" },
@@ -800,7 +845,6 @@ function BreakEvenSection({ data, setData, formatNum }) {
       )
     ),
 
-    // Cumulative Cashflow Chart
     React.createElement("div", { className: "bg-white p-6 rounded-xl border space-y-3" },
       React.createElement("h3", { className: "text-sm font-bold text-brand-900 border-b pb-2" }, "📈 ແຜນພູມກະແສເງິນສົດສະສົມ (Cumulative Cash Flow Graph)"),
       React.createElement("div", { className: "h-64 relative" },
@@ -811,7 +855,7 @@ function BreakEvenSection({ data, setData, formatNum }) {
 }
 
 /* =========================================================================
-   FULL RECIPE SUITE COMPONENT
+   FULL RECIPE SUITE COMPONENT (WITH PRESET FILTER & BORDERED TICKETS)
    ========================================================================= */
 function FullRecipeSuite({
   ingredients, recipes, presets, categories,
@@ -822,6 +866,8 @@ function FullRecipeSuite({
   saveRecipeSuiteToFirebase
 }){
   const [search, setSearch] = useState("");
+  const [filterPreset, setFilterPreset] = useState("all");
+
   const [bName, setBName] = useState("");
   const [bCategory, setBCategory] = useState(categories[0] || "");
   const [bNewCat, setBNewCat] = useState("");
@@ -866,6 +912,20 @@ function FullRecipeSuite({
       setBAttachedPresets({});
     }
   }, [editingRecipe, presets]);
+
+  const filteredRecipes = useMemo(() => {
+    let list = recipes;
+    if (filterPreset !== 'all') {
+      const selPreset = presets.find(p => p.id === filterPreset);
+      if (selPreset && selPreset.recipeIds) {
+        list = recipes.filter(r => selPreset.recipeIds.includes(r.id));
+      }
+    }
+    if (search.trim()) {
+      list = list.filter(r => r.name.toLowerCase().includes(search.toLowerCase()));
+    }
+    return list;
+  }, [recipes, presets, filterPreset, search]);
 
   const handleAddNewCategory = (e) => {
     e.preventDefault();
@@ -957,9 +1017,16 @@ function FullRecipeSuite({
     }
   };
 
+  // NATIVE STREAM 2-COLUMN RECIPE PDF (FILTERED BY PRESET + CLEAR 2px BORDER)
   const exportTicket2ColPDF = () => {
+    const recipesToExport = filteredRecipes;
+    if (recipesToExport.length === 0) return alert("ບໍ່ມີລາຍການສູດອາຫານໃນ Preset ທີ່ເລືອກ");
+
+    const selectedPresetObj = presets.find(p => p.id === filterPreset);
+    const presetNameTag = selectedPresetObj ? ` [ສາຂາ: ${selectedPresetObj.name}]` : ' [ທຸກໆສາຂາ]';
+
     const categoriesMap = {};
-    recipes.forEach(r => {
+    recipesToExport.forEach(r => {
       let cat = (r.category || "General").trim();
       if (!categoriesMap[cat]) categoriesMap[cat] = [];
       categoriesMap[cat].push(r);
@@ -968,38 +1035,43 @@ function FullRecipeSuite({
     const categoriesHtml = Object.keys(categoriesMap).map(catName => {
       const list = categoriesMap[catName];
       const cardsHtml = list.map(r => `
-        <div style="border: 1.5px solid #1D6FB8; border-radius: 8px; padding: 10px; background: #fff; page-break-inside: avoid; margin-bottom: 10px;">
-          <div style="display: flex; justify-content: space-between; border-bottom: 1.5px solid #1D6FB8; padding-bottom: 4px; margin-bottom: 6px;">
-            <b style="color: #124E85; font-size: 12px;">${r.name}</b>
-            <span style="font-size: 9px; background: #E2EEF8; color: #124E85; padding: 1px 6px; border-radius: 4px; font-weight: bold;">${r.servings || r.category}</span>
+        <div style="border: 2px solid #124E85; border-radius: 8px; padding: 10px; background: #ffffff; page-break-inside: avoid; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(18,78,133,0.15);">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #1D6FB8; padding-bottom: 5px; margin-bottom: 6px; background: #E2EEF8; padding: 4px 6px; border-radius: 4px;">
+            <b style="color: #124E85; font-size: 11.5px;">${r.name}</b>
+            <span style="font-size: 8.5px; background: #124E85; color: #ffffff; padding: 2px 6px; border-radius: 4px; font-weight: bold;">${r.servings || r.category}</span>
           </div>
-          <table style="width: 100%; border-collapse: collapse; font-size: 9.5px; margin-bottom: 6px;">
+          <table style="width: 100%; font-size: 9px; margin-bottom: 6px; border-collapse: collapse;">
             <thead>
-              <tr style="background: #f4f7fb; border-bottom: 1px solid #1D6FB8;">
-                <th style="text-align: left; padding: 2px;">ວັດຖຸດິບ</th>
-                <th style="text-align: right; padding: 2px;">ປະລິມານ</th>
+              <tr style="background: #f4f7fb; border-bottom: 1px solid #1D6FB8; color: #124E85;">
+                <th style="text-align: left; padding: 3px 5px; border-right: 1px solid #E2EEF8;">ວັດຖຸດິບ / ສ່ວນປະສົມ</th>
+                <th style="text-align: right; padding: 3px 5px; width: 70px;">ປະລິມານ</th>
               </tr>
             </thead>
             <tbody>
               ${r.items.map(it => `
                 <tr style="border-bottom: 1px solid #E2EEF8;">
-                  <td style="padding: 2px;">${it.name}</td>
-                  <td style="text-align: right; font-weight: bold; padding: 2px;">${it.qty} ${it.unit}</td>
+                  <td style="padding: 3px 5px; color: #0F2A43; border-right: 1px solid #E2EEF8;">${it.name}</td>
+                  <td style="text-align: right; font-weight: bold; padding: 3px 5px; color: #124E85;">${it.qty} ${it.unit}</td>
                 </tr>
               `).join('')}
             </tbody>
           </table>
           ${r.steps ? `
-            <div style="font-size: 8.5px; color: #0F2A43; background: #fafafa; padding: 4px; border-radius: 4px;">
-              <b>SOP ຂັ້ນຕອນ:</b><br/>${r.steps.replace(/\n/g, '<br/>')}
+            <div style="font-size: 8px; color: #0F2A43; background: #fafafa; padding: 5px; border-radius: 4px; border: 1px solid #c8d9e6;">
+              <b style="color: #124E85;">💡 SOP ຂັ້ນຕອນ:</b><br/>${r.steps.replace(/\n/g, '<br/>')}
+            </div>
+          ` : ''}
+          ${r.notes ? `
+            <div style="font-size: 8px; color: #5D4037; background: #FFF9C4; padding: 4px; border-radius: 3px; margin-top: 4px; border: 1px solid #FFF59D;">
+              ⚠️ <b>ໝາຍເຫດ:</b> ${r.notes}
             </div>
           ` : ''}
         </div>
       `).join('');
 
       return `
-        <div style="margin-bottom: 15px;">
-          <h2 style="background: #124E85; color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 4px; margin-bottom: 8px; text-transform: uppercase;">📂 ໝວດໝູ່: ${catName}</h2>
+        <div style="margin-bottom: 14px;">
+          <div style="background: #124E85; color: #ffffff; font-size: 11px; padding: 5px 10px; border-radius: 4px; margin-bottom: 8px; font-weight: bold; text-transform: uppercase;">📂 ໝວດໝູ່: ${catName}</div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             ${cardsHtml}
           </div>
@@ -1007,24 +1079,21 @@ function FullRecipeSuite({
       `;
     }).join('');
 
-    const printableDiv = document.createElement("div");
-    printableDiv.className = "a4-document";
-    printableDiv.innerHTML = `
-      <div style="text-align: center; border-bottom: 2px solid #124E85; padding-bottom: 8px; margin-bottom: 12px;">
-        <h1 style="font-size: 18px; color: #124E85; margin: 0; font-weight: bold;">📜 ປຶ້ມໃບສູດອາຫານ Ticket Recipe Book (2 Columns)</h1>
-        <p style="font-size: 10px; color: #4C6C87; margin: 2px 0 0 0;">BrandCraft Executive Suite — Standard Operating Procedure Manual</p>
+    const fullContentHtml = `
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #124E85; padding-bottom: 8px; margin-bottom: 12px;">
+        <div>
+          <h1 style="font-size: 16px; color: #124E85; margin: 0; font-weight: bold;">📜ສູດເຄື່ອງດື່ມ Recipe Book ${presetNameTag}</h1>
+          <p style="font-size: 9px; color: #4C6C87; margin: 2px 0 0 0;">BrandCraft Executive Suite — Standard Operating Procedure Manual </p>
+        </div>
+        <div style="text-align: right; font-size: 9px; color: #4C6C87;">
+          <p style="margin: 0; font-weight: bold; color: #124E85;">inspired by La Dolce Ltd.</p>
+          <p style="margin: 2px 0 0 0;">ວັນທີ: ${new Date().toLocaleDateString('lo-LA')}</p>
+        </div>
       </div>
       ${categoriesHtml}
     `;
 
-    const opt = {
-      margin:       [8, 8, 8, 8],
-      filename:     `Recipe_Book_Tickets_2Column_${Date.now()}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(printableDiv).save();
+    printHtmlToA4PDF(`Recipe_Book_${filterPreset}`, fullContentHtml);
   };
 
   return React.createElement("div", { className: "bg-white p-6 rounded-xl border shadow-sm space-y-6" },
@@ -1047,17 +1116,35 @@ function FullRecipeSuite({
       )
     ),
 
-    // SUB-TAB 1: SOP VIEW
+    // SUB-TAB 1: SOP VIEW (WITH PRESET FILTER DROPDOWN & PRINT BUTTON)
     recipeSubTab === "sop" && React.createElement("div", { className: "grid grid-cols-1 lg:grid-cols-12 gap-6" },
       React.createElement("div", { className: "lg:col-span-5 space-y-3" },
-        React.createElement("div", { className: "flex gap-2" },
-          React.createElement("input", { type: "text", placeholder: "🔍 ປ້ອນຊື່ສູດ...", value: search, onChange: e => setSearch(e.target.value), className: "w-full border rounded p-2 text-xs" }),
-          React.createElement("button", { onClick: exportTicket2ColPDF, className: "bg-green-600 text-white text-[11px] px-2.5 py-1 rounded font-bold whitespace-nowrap hover:bg-green-700 shadow" }, "📄 Export Ticket PDF (2 Col)")
+        
+        // Preset Filter & Search Toolbar
+        React.createElement("div", { className: "bg-brand-50 p-2.5 rounded-xl border border-brand-100 space-y-2" },
+          React.createElement("div", { className: "flex justify-between items-center" },
+            React.createElement("label", { className: "text-[11px] font-bold text-brand-900 uppercase" }, "🏪 ເລືອກພຣີເຊັດສາຂາທີ່ຈະເບິ່ງ/ພິມ:"),
+            React.createElement("span", { className: "text-[10px] text-gray-500 font-bold" }, filteredRecipes.length + " ສູດ")
+          ),
+          React.createElement("select", {
+            value: filterPreset,
+            onChange: e => setFilterPreset(e.target.value),
+            className: "w-full border rounded p-1.5 text-xs font-bold text-brand-900 bg-white"
+          },
+            React.createElement("option", { value: "all" }, "🌐 ທຸກໆສາຂາ / ຮ້ານທັງໝົດ (All Recipes)"),
+            presets.map(p => React.createElement("option", { key: p.id, value: p.id }, "🏪 " + p.name + " (" + (p.recipeIds || []).length + " ສູດ)"))
+          ),
+          React.createElement("div", { className: "flex gap-2 pt-1" },
+            React.createElement("input", { type: "text", placeholder: "🔍 ປ້ອນຊື່ສູດຄົ້ນຫາ...", value: search, onChange: e => setSearch(e.target.value), className: "w-full border rounded p-1.5 text-xs font-semibold" }),
+            React.createElement("button", { onClick: exportTicket2ColPDF, className: "bg-green-600 text-white text-[11px] px-3 py-1.5 rounded font-bold whitespace-nowrap hover:bg-green-700 shadow" }, "📄 Print PDF 2-Col")
+          )
         ),
-        recipes.filter(r => r.name.toLowerCase().includes(search.toLowerCase())).map(r => React.createElement("div", {
+
+        // Recipe List
+        filteredRecipes.map(r => React.createElement("div", {
           key: r.id,
           onClick: () => setActiveSopRecipe(r),
-          className: `p-3 rounded-lg border cursor-pointer flex justify-between items-center ${activeSopRecipe && activeSopRecipe.id === r.id ? 'border-brand-500 bg-brand-50' : 'hover:bg-gray-50'}`
+          className: `p-3 rounded-lg border cursor-pointer flex justify-between items-center ${activeSopRecipe && activeSopRecipe.id === r.id ? 'border-brand-500 bg-brand-50 shadow-sm' : 'hover:bg-gray-50'}`
         },
           React.createElement("div", null,
             React.createElement("h4", { className: "font-bold text-sm text-brand-900" }, r.name),
@@ -1069,6 +1156,7 @@ function FullRecipeSuite({
           )
         ))
       ),
+
       React.createElement("div", { className: "lg:col-span-7" },
         activeSopRecipe ? React.createElement("div", { className: "sop-card space-y-4" },
           React.createElement("div", { className: "flex justify-between border-b pb-2" },
@@ -1077,7 +1165,7 @@ function FullRecipeSuite({
           ),
           React.createElement("div", null,
             React.createElement("h4", { className: "text-xs font-bold text-gray-700 uppercase mb-2" }, "📋 ອັດຕາສ່ວນປະສົມ"),
-            React.createElement("table", { className: "w-full text-xs" },
+            React.createElement("table", { className: "w-full text-xs border-collapse" },
               React.createElement("tbody", { className: "divide-y" },
                 activeSopRecipe.items.map((it, i) => React.createElement("tr", { key: i },
                   React.createElement("td", { className: "py-1 font-medium" }, it.name),
@@ -1234,6 +1322,222 @@ function FullRecipeSuite({
             }, "🗑️ ລຶບ")
           )
         ))
+      )
+    )
+  );
+}
+
+/* =========================================================================
+   TAB 6: QUOTATION COMPONENT
+   ========================================================================= */
+function QuotationSection({ header, setHeader, items, setItems, discount, setDiscount, formatNum }) {
+  const [newItemName, setNewItemName] = useState("");
+  const [newItemQty, setNewItemQty] = useState(1);
+  const [newItemPrice, setNewItemPrice] = useState("");
+
+  const subTotal = items.reduce((sum, item) => sum + ((Number(item.qty) || 0) * (Number(item.price) || 0)), 0);
+  const grandTotal = Math.max(0, subTotal - (Number(discount) || 0));
+
+  const handleAddItem = (e) => {
+    e.preventDefault();
+    if (!newItemName.trim() || !newItemPrice) return alert("ກະລຸນາໃສ່ຊື່ສິນຄ້າ ແລະ ລາຄາ");
+    const updated = [...items, { id: uid("qti"), name: newItemName.trim(), qty: Number(newItemQty) || 1, price: Number(newItemPrice) || 0 }];
+    setItems(updated);
+    setNewItemName(""); setNewItemQty(1); setNewItemPrice("");
+  };
+
+  const handleDeleteItem = (id) => {
+    setItems(items.filter(item => item.id !== id));
+  };
+
+  const exportQuotationPDF = () => {
+    const fullContentHtml = `
+      <table style="width: 100%; border-bottom: 2px solid #124E85; padding-bottom: 10px; margin-bottom: 15px; table-layout: fixed;">
+        <tr>
+          <td style="vertical-align: top; width: 65%;">
+            <h1 style="font-size: 17px; font-weight: bold; color: #124E85; margin: 0;">${header.title}</h1>
+            <p style="font-size: 11px; font-weight: bold; color: #0F2A43; margin: 4px 0 0 0;">ລູກຄ້າ/ໂຄງການ: ${header.customerName}</p>
+          </td>
+          <td style="text-align: right; vertical-align: top; font-size: 9.5px; color: #4C6C87; width: 35%;">
+            <p style="margin: 0; font-weight: bold; color: #124E85;">ເລກທີ: ${header.quoteNo}</p>
+            <p style="margin: 2px 0 0 0;">ວັນທີ: ${header.date}</p>
+          </td>
+        </tr>
+      </table>
+
+      <table class="q-table" style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+        <thead>
+          <tr style="background: #124E85; color: #ffffff;">
+            <th style="padding: 6px; text-align: center; width: 35px; border: 1px solid #124E85;">#</th>
+            <th style="padding: 6px; text-align: left; border: 1px solid #124E85;">ລາຍການສິນຄ້າ / ວິຍາຍ</th>
+            <th style="padding: 6px; text-align: center; width: 60px; border: 1px solid #124E85;">ຈຳນວນ</th>
+            <th style="padding: 6px; text-align: right; width: 110px; border: 1px solid #124E85;">ລາຄາ/ໜ່ວຍ</th>
+            <th style="padding: 6px; text-align: right; width: 120px; border: 1px solid #124E85;">ລວມເງິນ</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${items.map((it, idx) => `
+            <tr style="border-bottom: 1px solid #E2EEF8; ${idx % 2 === 1 ? 'background: #f8fafc;' : ''}">
+              <td style="padding: 6px; text-align: center;">${idx + 1}</td>
+              <td style="padding: 6px; font-weight: 600; color: #0F2A43;">${it.name}</td>
+              <td style="padding: 6px; text-align: center;">${it.qty}</td>
+              <td style="padding: 6px; text-align: right;">${formatNum(it.price)}</td>
+              <td style="padding: 6px; text-align: right; font-weight: bold; color: #124E85;">${formatNum(it.qty * it.price)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+
+      <table style="width: 100%; margin-top: 10px; table-layout: fixed;">
+        <tr>
+          <td style="vertical-align: top; width: 60%; padding-right: 15px;">
+            <div style="border: 1px solid #c8d9e6; border-radius: 6px; padding: 10px; background: #fafafa; font-size: 9px;">
+              <b style="color: #124E85;">📝 ໝາຍເຫດ & ເງື່ອນໄຂການຊຳລະເງິນ:</b>
+              <div style="white-space: pre-line; margin-top: 4px; color: #4C6C87; line-height: 1.4;">${header.notes}</div>
+            </div>
+          </td>
+          <td style="vertical-align: top; width: 40%;">
+            <table style="width: 100%; font-size: 10.5px;">
+              <tr>
+                <td style="padding: 4px 0; color: #4C6C87;">ລວມມູນຄ່າສິນຄ້າ:</td>
+                <td style="padding: 4px 0; text-align: right; font-weight: bold; color: #0F2A43;">${formatNum(subTotal)}</td>
+              </tr>
+              <tr>
+                <td style="padding: 4px 0; color: #B23B3B;">ສ່ວນຫຼຸດ (Discount):</td>
+                <td style="padding: 4px 0; text-align: right; font-weight: bold; color: #B23B3B;">-${formatNum(discount)}</td>
+              </tr>
+              <tr style="border-top: 2px solid #124E85;">
+                <td style="padding: 6px 0; font-size: 12px; color: #124E85; font-weight: bold;">ລວມຍອດສຸດທິ:</td>
+                <td style="padding: 6px 0; text-align: right; font-size: 14px; color: #124E85; font-weight: bold;">${formatNum(grandTotal)}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <table style="width: 100%; margin-top: 50px; text-align: center; font-size: 10px; table-layout: fixed;">
+        <tr>
+          <td style="width: 50%;">
+            <p style="font-weight: bold; color: #0F2A43; margin: 0;">ຜູ້ສະເໜີລາຄາ</p>
+            <div style="border-bottom: 1px solid #000; width: 150px; margin: 40px auto 0 auto;"></div>
+            <p style="margin: 4px 0 0 0; color: #4C6C87;">ວັນທີ: ____/____/____</p>
+          </td>
+          <td style="width: 50%;">
+            <p style="font-weight: bold; color: #124E85; margin: 0;">ຜູ້ອະນຸມັດ/ລູກຄ້າ</p>
+            <div style="border-bottom: 1px solid #000; width: 150px; margin: 40px auto 0 auto;"></div>
+            <p style="margin: 4px 0 0 0; color: #4C6C87;">ວັນທີ: ____/____/____</p>
+          </td>
+        </tr>
+      </table>
+    `;
+
+    printHtmlToA4PDF(`Quotation_${header.quoteNo}`, fullContentHtml);
+  };
+
+  return React.createElement("div", { className: "bg-white p-6 rounded-xl border shadow-sm space-y-6" },
+    React.createElement("div", { className: "flex justify-between items-center border-b pb-4 flex-wrap gap-2" },
+      React.createElement("div", null,
+        React.createElement("h2", { className: "text-xl font-bold text-brand-900" }, "6. ເຄື່ອງມືອອກໃບສະເໜີລາຄາ (Quotation Generator)"),
+        React.createElement("p", { className: "text-xs text-gray-500" }, "ຈັດການສິນຄ້າ, ກຳນົດລາຄາ ແລະ Export PDF Layout A4 ທາງການ")
+      ),
+      React.createElement("button", { onClick: exportQuotationPDF, className: "bg-green-600 hover:bg-green-700 text-white font-bold text-xs px-4 py-2 rounded-lg shadow flex items-center gap-1" }, "📄 ດາວໂຫຼດໃບສະເໜີລາຄາ PDF (A4)")
+    ),
+
+    React.createElement("div", { className: "bg-brand-50 p-4 rounded-xl border border-brand-100 space-y-3" },
+      React.createElement("h3", { className: "text-xs font-bold text-brand-900 uppercase" }, "📝 ຂໍ້ມູນຫົວເອກະສານ (Quotation Header)"),
+      React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs" },
+        React.createElement("div", null,
+          React.createElement("label", { className: "block font-semibold mb-1" }, "ຫົວຂໍ້ເອກະສານ Title"),
+          React.createElement("input", { type: "text", value: header.title, onChange: e => setHeader({...header, title: e.target.value}), className: "w-full border rounded p-2 bg-white font-bold text-brand-900" })
+        ),
+        React.createElement("div", null,
+          React.createElement("label", { className: "block font-semibold mb-1" }, "ຊື່ລູກຄ້າ / ໂຄງການ"),
+          React.createElement("input", { type: "text", value: header.customerName, onChange: e => setHeader({...header, customerName: e.target.value}), className: "w-full border rounded p-2 bg-white font-semibold" })
+        ),
+        React.createElement("div", null,
+          React.createElement("label", { className: "block font-semibold mb-1" }, "ເລກທີເອກະສານ Quote No"),
+          React.createElement("input", { type: "text", value: header.quoteNo, onChange: e => setHeader({...header, quoteNo: e.target.value}), className: "w-full border rounded p-2 bg-white font-mono" })
+        ),
+        React.createElement("div", null,
+          React.createElement("label", { className: "block font-semibold mb-1" }, "ວັນທີ Date"),
+          React.createElement("input", { type: "date", value: header.date, onChange: e => setHeader({...header, date: e.target.value}), className: "w-full border rounded p-2 bg-white" })
+        )
+      )
+    ),
+
+    React.createElement("form", { onSubmit: handleAddItem, className: "flex gap-2 items-end border p-3 rounded-xl bg-gray-50 flex-wrap" },
+      React.createElement("div", { className: "flex-1 min-w-[200px]" },
+        React.createElement("label", { className: "block text-xs font-semibold mb-1" }, "ຊື່ສິນຄ້າ / ລາຍການອຸປະກອນ *"),
+        React.createElement("input", { type: "text", placeholder: "ເຊັ່ນ: ເຄື່ອງຊົງກາເຟ 2 ຫົວຊົງ...", value: newItemName, onChange: e => setNewItemName(e.target.value), className: "w-full border rounded p-2 text-xs font-semibold" })
+      ),
+      React.createElement("div", { className: "w-24" },
+        React.createElement("label", { className: "block text-xs font-semibold mb-1" }, "ຈຳນວນ"),
+        React.createElement("input", { type: "number", min: "1", value: newItemQty, onChange: e => setNewItemQty(e.target.value), className: "w-full border rounded p-2 text-xs text-center font-bold" })
+      ),
+      React.createElement("div", { className: "w-36" },
+        React.createElement("label", { className: "block text-xs font-semibold mb-1" }, "ລາຄາ/ໜ່ວຍ"),
+        React.createElement("input", { type: "number", placeholder: "0", value: newItemPrice, onChange: e => setNewItemPrice(e.target.value), className: "w-full border rounded p-2 text-xs text-right font-bold" })
+      ),
+      React.createElement("button", { type: "submit", className: "bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow" }, "➕ ເພີ່ມສິນຄ້າ")
+    ),
+
+    React.createElement("div", { className: "overflow-x-auto border rounded-xl" },
+      React.createElement("table", { className: "w-full text-left text-xs border-collapse" },
+        React.createElement("thead", { className: "bg-brand-900 text-white uppercase" },
+          React.createElement("tr", null,
+            React.createElement("th", { className: "p-3 text-center w-10" }, "#"),
+            React.createElement("th", { className: "p-3" }, "ລາຍການສິນຄ້າ"),
+            React.createElement("th", { className: "p-3 text-center w-20" }, "ຈຳນວນ"),
+            React.createElement("th", { className: "p-3 text-right w-32" }, "ລາຄາ/ໜ່ວຍ"),
+            React.createElement("th", { className: "p-3 text-right w-36" }, "ລວມເງິນ"),
+            React.createElement("th", { className: "p-3 text-center w-16" }, "ຈັດການ")
+          )
+        ),
+        React.createElement("tbody", { className: "divide-y" },
+          items.length === 0 ? React.createElement("tr", null, React.createElement("td", { colSpan: "6", className: "p-6 text-center text-gray-400" }, "ຍັງບໍ່ມີລາຍການສິນຄ້າ")) :
+          items.map((it, idx) => React.createElement("tr", { key: it.id, className: "hover:bg-gray-50" },
+            React.createElement("td", { className: "p-3 text-center font-bold" }, idx + 1),
+            React.createElement("td", { className: "p-3 font-semibold text-brand-900" }, it.name),
+            React.createElement("td", { className: "p-3 text-center font-bold" }, it.qty),
+            React.createElement("td", { className: "p-3 text-right font-medium" }, formatNum(it.price)),
+            React.createElement("td", { className: "p-3 text-right font-extrabold text-brand-900" }, formatNum(it.qty * it.price)),
+            React.createElement("td", { className: "p-3 text-center" },
+              React.createElement("button", { onClick: () => handleDeleteItem(it.id), className: "text-red-600 font-bold hover:underline" }, "🗑️")
+            )
+          ))
+        )
+      )
+    ),
+
+    React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6 pt-2" },
+      React.createElement("div", { className: "space-y-2" },
+        React.createElement("label", { className: "block text-xs font-bold text-brand-900" }, "📝 ໝາຍເຫດ & ເງື່ອນໄຂການຊຳລະເງິນ:"),
+        React.createElement("textarea", {
+          rows: "3",
+          value: header.notes,
+          onChange: e => setHeader({...header, notes: e.target.value}),
+          className: "w-full border rounded-lg p-2.5 text-xs bg-gray-50"
+        })
+      ),
+
+      React.createElement("div", { className: "bg-brand-50 p-4 rounded-xl border border-brand-100 space-y-2 text-xs" },
+        React.createElement("div", { className: "flex justify-between" },
+          React.createElement("span", { className: "text-gray-600 font-semibold" }, "ລວມມູນຄ່າສິນຄ້າລວມ (Subtotal):"),
+          React.createElement("b", { className: "text-brand-900 font-bold" }, formatNum(subTotal))
+        ),
+        React.createElement("div", { className: "flex justify-between items-center" },
+          React.createElement("span", { className: "text-red-600 font-semibold" }, "ສ່ວນຫຼຸດ (Discount):"),
+          React.createElement("input", {
+            type: "number",
+            value: discount,
+            onChange: e => setDiscount(Number(e.target.value)),
+            className: "border rounded px-2 py-0.5 w-32 text-right font-bold text-red-600 bg-white"
+          })
+        ),
+        React.createElement("div", { className: "flex justify-between items-center border-t-2 border-brand-500 pt-2 text-sm text-brand-900 font-extrabold" },
+          React.createElement("span", null, "ລວມຍອດສຸດທິ (Grand Total):"),
+          React.createElement("span", { className: "text-xl text-brand-500" }, formatNum(grandTotal))
+        )
       )
     )
   );
